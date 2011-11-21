@@ -2,9 +2,9 @@
 
 	#
 	#  ParamSearch.pl
-	#  VisBack
+	#  SMI
 	#
-	#  Created by Bedeho Mender on 29/04/11.
+	#  Created by Bedeho Mender on 21/11/11.
 	#  Copyright 2011 OFTNAI. All rights reserved.
 	#
 

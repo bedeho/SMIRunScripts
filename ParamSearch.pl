@@ -2,9 +2,9 @@
 
 	#
 	#  ParamSearch.pl
-	#  VisBack
+	#  SMI
 	#
-	#  Created by Bedeho Mender on 29/04/11.
+	#  Created by Bedeho Mender on 21/11/11.
 	#  Copyright 2011 OFTNAI. All rights reserved.
 	#
 
@@ -23,7 +23,7 @@
 	
 	my $experiment 						= "test"; # , test
 	my $stimuliTraining 				= "projectBenTraining"; #projectBenTraining,TR_2O_9T_2L,CT_2O_81T_16L
-	my $stimuliTesting 					= "projectBenTesting"; #projectBenTesting, TR_2O_9T_2L
+	my $stimuliTesting 					= ["projectBenTesting"]; #projectBenTesting, TR_2O_9T_2L
 	my $xgrid 							= "0"; # "0" = false, "1" = true
 	
 	# FIXED PARAMS - non permutable

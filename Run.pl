@@ -1,23 +1,23 @@
 #!/usr/bin/perl
-
+	
 	#
 	#  ParamSearch.pl
-	#  VisBack
+	#  SMI
 	#
-	#  Created by Bedeho Mender on 29/04/11.
+	#  Created by Bedeho Mender on 21/11/11.
 	#  Copyright 2011 OFTNAI. All rights reserved.
 	#
-
+	
 	use strict;
-    use warnings;
-    use POSIX;
+	use warnings;
+	use POSIX;
 	use File::Copy;
 	use Data::Dumper;
 	use myConfig;
-
+	
 	my $command;
 	if($#ARGV < 0) {
-
+	
 		print "To few arguments passed.\n";
 		print "Usage:\n";
 		print "Arg. 1:";
@@ -31,12 +31,12 @@
 		exit;
 	}
 	else {
-        $command = $ARGV[0];
+	       $command = $ARGV[0];
 	}
 	
 	my $experiment;
 	if($#ARGV >= 1) {
-        $experiment = $ARGV[1];
+	       $experiment = $ARGV[1];
 	}
 	else {
 		die "No experiment name provided\n";
@@ -47,8 +47,8 @@
 	
 	# copy stuff into testing training folders
 	if($command eq "build") {
-        system($PROGRAM, "build", $parameterFile, $experimentFolder) == 0 or die "Could not execute simulator, or simulator returned 0.\n";
-
+	       system($PROGRAM, "build", $parameterFile, $experimentFolder) == 0 or die "Could not execute simulator, or simulator returned 0.\n";
+	
 	} else {
 		
 		my $simulation;
@@ -61,7 +61,7 @@
 		my $simulationFolder 		= $experimentFolder.$simulation."/";
 		
 		if ($command eq "loadtest") {
-
+	
 			# Add md5 test here
 			my $networkFile;
 			if($#ARGV >= 3) {
@@ -71,7 +71,7 @@
 			}
 			
 			system($PROGRAM, $command, $parameterFile, $networkFile, $simulationFolder) == 0 or die "Could not execute simulator, or simulator returned 0.\n";
-        } else {
+	       } else {
 		
 			my $stimuli;
 			if($#ARGV >= 3) {
@@ -96,13 +96,13 @@
 					opendir(DIR, $simulationFolder) or die $!;
 					
 					while (my $file = readdir(DIR)) {
-
+	
 						# We only want files
 						next unless (-f $simulationFolder.$file);
 	
 						# Use a regular expression to find files of the form *Network*
 						next unless ($file =~ m/Network/);
-
+	
 						# Run simulation
 						doTest($PROGRAM, $parameterFile, $file, $experimentFolder, $stimuliFolder, $simulationFolder);
 					}
@@ -128,12 +128,12 @@
 				# Move result files into result folder
 				system("mv ${simulationFolder}*.dat $destinationFolder");
 	        }
-        }
+	       }
 	}
 	
 	# Run test on network, make result folder
 	sub doTest {
-
+	
 		my ($PROGRAM, $parameterFile, $net, $experimentFolder, $stimuliFolder, $simulationFolder) = @_;
 		
 		my $networkFile = $simulationFolder.$net;
