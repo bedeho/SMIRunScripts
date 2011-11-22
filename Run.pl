@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 	
 	#
-	#  ParamSearch.pl
+	#  Run.pl
 	#  SMI
 	#
 	#  Created by Bedeho Mender on 21/11/11.

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 	#
-	#  ParamSearch.pl
+	#  xGridCleanup.pl
 	#  SMI
 	#
 	#  Created by Bedeho Mender on 21/11/11.
@@ -101,67 +101,3 @@
 	
 	# Call matlab to plot all
 	system($MATLAB . " -r \"cd('$MATLAB_SCRIPT_FOLDER');plotExperimentInvariance('$experiment');\"");
-
-	# Check to see that all results are back
-    #my $sleepTime = 30;
-    #my $foundSleepTime = 60*5;
-    #my $nrOfSleeps = 0;
-    #my $found = 0;
-    #
-	#while ($found != $counter) {
-	#	
-	#	# Sleep for 30 seconds for next check
-	#	print "$nrOfSleeps . Results not back, sleeping $sleepTime seconds... \n";
-	#	$nrOfSleeps++;
-	#	sleep($sleepTime);
-	#	
-	#	opendir(DIR, $experimentFolder) or die $!;
-	#	
-	#	while (my $dir = readdir(DIR)) {
-	#		
-	#		# Check that it is a directory
-	#       next unless (-d $experimentFolder.$dir);
-	#		
-	#		# Check that it is a number and check its range
-	#		if($dir eq int $dir && ($dir >= 0 && $dir < $counter)) {
-	#			
-	#			# check if it has nonzero tar file to be sure!!
-	#			$found++;
-	#		}
-	#	}
-	#	
-	#	closedir(DIR);
-	#};
-	#
-	#print "Found all results, sleeping for $foundSleepTime seconds to make sure all results are completely downloaded... \n";
-	#sleep($foundSleepTime);
-    #
-    # Process each result folder
-  	#opendir(DIR, $experimentFolder) or die $!;
-	#
-	#while (my $dir = readdir(DIR)) {
-	#	
-	#	# Check that it is a directory
-    #    next unless (-d $experimentFolder.$dir);
-	#		
-	#	# Check that it is a number and check its range
-	##	if($dir eq int $dir && ($dir >= 0 && $dir < $counter)) {
-	#		
-	#		# Find the right param file
-	#		my @files = glob($experimentFolder.$dir.'_*.txt');
-	#		
-	#		if($#files != 0) {
-	#			print "Unique parameter file was not found for result $dir\n";
-	#			print Dumper(@files);
-	#			exit;
-	#		}
-	#		
-	#		#Process file
-	#
-    #
-	#		
-	#	}
-	#}
-	#
-	#closedir(DIR);
-    
