@@ -113,7 +113,7 @@
 	        } elsif($command eq "train") {
 	        	
 				my $networkFile = "${experimentFolder}BlankNetwork.txt";
-				system($PROGRAM, $command, $parameterFile, $networkFile, "${stimuliFolder}FileList.txt", "${stimuliFolder}Filtered/", $simulationFolder) == 0 or die "Could not execute simulator, or simulator returned 0.\n";
+				system($PROGRAM, $command, $parameterFile, $networkFile, "${stimuliFolder}data.dat",  $simulationFolder) == 0 or die "Could not execute simulator, or simulator returned 0.\n";
 				
 				# Cleanup
 				my $destinationFolder = $simulationFolder."Training";
@@ -138,7 +138,7 @@
 		
 		my $networkFile = $simulationFolder.$net;
 		
-		system($PROGRAM, "test", $parameterFile, $networkFile, "${stimuliFolder}FileList.txt", "${stimuliFolder}Filtered/", $simulationFolder) == 0 or die "Could not execute simulator, or simulator returned 0.\n";
+		system($PROGRAM, "test", $parameterFile, $networkFile, "${stimuliFolder}data.dat", $simulationFolder) == 0 or die "Could not execute simulator, or simulator returned 0.\n";
 		
 		# Make result directory
 		my $newFolder = substr $net, 0, length($net) - 4;
