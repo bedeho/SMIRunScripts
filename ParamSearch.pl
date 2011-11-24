@@ -388,9 +388,8 @@
 */
 
 /*
-* Tells run command what type
-* of activation function to use:
-* 0 = rate coded, 1 = leaky integrator
+* What type of neuron type to use:
+* 0 = discrete, 1 = leaky integrator
 */
 neuronType = $neuronType;
 
