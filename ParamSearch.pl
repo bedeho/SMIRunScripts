@@ -21,24 +21,27 @@
     # Input
     ################################################################################################################################################################################################
 	
+	# Run values
 	my $experiment 						= "test";
-	my $stimuliTraining 				= "Simple";
-	my $stimuliTesting 					= "Test";
+	my $stimuliTraining 				= "simple_training";
+	my $stimuliTesting 					= "simple_testing"; # add support for multiple
 	my $xgrid 							= "0"; # "0" = false, "1" = true
+	my $nrOfEyePositionsInTesting		= "3";
 	
 	# FIXED PARAMS - non permutable
-	my $visualPreferenceDistance		= 2;
-	my $eyePositionPrefrerenceDistance	= 2;
-	my $gaussianSigma					= 5;
-	my $sigmoidSlope					= 0.5;
-	my $connectivity					= 0; # 0 = full, 1 = sparse
+	my $visualPreferenceDistance		= "2.0";
+	my $eyePositionPrefrerenceDistance	= "2.0";
+	my $gaussianSigma					= "5.0";
+	my $sigmoidSlope					= "0.5";
 	my $horVisualFieldSize				= "200.0";
-	my $horEyePositionFieldSize			= "120.0";
+	my $horEyePositionFieldSize			= "125.0";
 	
-	my $neuronType						= 0; # 0 = discrete, 1 = continuous
+	my $connectivity					= 0; # 0 = full, 1 = sparse <- not really used
+	
+	my $neuronType						= 1; # 0 = discrete, 1 = continuous
     my $learningRule					= 1; # 0 = trace, 1 = hebb
     
-    my $nrOfEpochs						= 30;
+    my $nrOfEpochs						= 2;
     my $saveNetworkAtEpochMultiple 		= 99;
 	my $outputAtTimeStepMultiple		= 101;
 	
@@ -51,20 +54,20 @@
     # Notice, layer one needs 3x because of small filter magnitudes, and 5x because of
     # number of afferent synapses, total 15x.
     my @learningRates 					= (
-    									["0.0100"],
+    									#["0.0100"],
     									["0.1000"]
     									);
     									
  	die "Invalid array: learningRates" if !validateArray(\@learningRates);
 
     my @sparsenessLevels				= ( 
-    									["0.90"],
-    									["0.95"]
+    									["0.90"]
+    									#["0.95"]
     									);
     die "Invalid array: sparsenessLevels" if !validateArray(\@sparsenessLevels);
     
     my @timeConstants					= ( 
-    									["0.050"],
+    									#["0.050"],
     									["0.500"]
     									);
     die "Invalid array: timeConstants" if !validateArray(\@timeConstants);
@@ -275,7 +278,7 @@
 							my $parameterFile = $experimentFolder.$simulationCode.".txt";
 							
 							# Make parameter file
-							print "\tWriting new parameter file: ". $simulationCode . $timeStepStr . " \n";
+							print "\tWriting new parameter file: ". $simulationCode . " \n"; # . $timeStepStr . 
 							
 							my $result = makeParameterFile(\@esRegionSettings, $sSF, $ttC);
 							
@@ -288,7 +291,7 @@
 							
 							# Add line to batch file
 							print XGRID_FILE "\n" if !$firstTime;
-							print XGRID_FILE "VisBack --xgrid train ${simulationCode}.txt BlankNetwork.txt";
+							print XGRID_FILE "$BINARY --xgrid train ${simulationCode}.txt BlankNetwork.txt";
 							
 							$firstTime = 0;
 						} else {
@@ -309,7 +312,7 @@
 								mkdir($simulationFolder, 0777) || print "$!\n";
 								
 								# Make parameter file and write to simulation folder
-								print "Writing new parameter file: ". $simulationCode  . $timeStepStr . " \n";
+								print "Writing new parameter file: ". $simulationCode . " \n"; # . $timeStepStr .
 								my $result = makeParameterFile(\@esRegionSettings, $sSF, $ttC);
 								
 								open (PARAMETER_FILE, '>'.$parameterFile) or die "Could not open file '$parameterFile'. $!\n";
@@ -354,7 +357,7 @@
 	}
 	else {
 		# Call matlab to plot all
-		system($MATLAB . " -r \"cd('$MATLAB_SCRIPT_FOLDER');plotExperimentInvariance('$experiment');\"");	
+		system($MATLAB . " -r \"cd('$MATLAB_SCRIPT_FOLDER');plotExperiment('$experiment',$nrOfEyePositionsInTesting);\"");	
 	}
 	
 	sub makeParameterFile {
@@ -503,8 +506,7 @@ playAtPrcntOfOriginalSpeed = 1.0;
 */
 seed = 55;
 
-7a: {
-	
+area7a: {
 	/*
 	* The distance between consecutive neuron preferences in visual space
 	*/
@@ -513,27 +515,27 @@ seed = 55;
 	/*
 	* The distance between consecutive neuron preferences in eye position space
 	*/	
-    eyePositionPrefrerenceDistance = $eyePositionPrefrerenceDistance;
-    
-    /*
-    * Spread of gaussian component
-    */
-    gaussianSigma = $gaussianSigma; 
-    
-    /*
-    * Slope of eye position sigmoid component
-    */
-    sigmoidSlope = $sigmoidSlope;
-    
-    /*
-    * Size of visual field in degrees
-    */
-    horVisualDimension = $horVisualDimension;
-    
-    /*
-    * Size of movement field in degrees
-    */
-    horEyePositionFieldSize = $horEyePositionFieldSize;
+	   eyePositionPrefrerenceDistance = $eyePositionPrefrerenceDistance;
+	         
+	   /*
+	   * Size of visual field in degrees
+	   */
+	   horVisualFieldSize = $horVisualFieldSize;
+	   
+	   /*
+	   * Size of movement field in degrees
+	   */
+	   horEyePositionFieldSize = $horEyePositionFieldSize;
+	   
+	   /*
+	   * Spread of gaussian component
+	   */
+	   gaussianSigma = $gaussianSigma; 
+	   
+	   /*
+	   * Slope of eye position sigmoid component
+	   */
+	   sigmoidSlope = $sigmoidSlope;
 };
 
 extrastriate: (
