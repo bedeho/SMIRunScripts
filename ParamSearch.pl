@@ -39,13 +39,13 @@
 	my $connectivity					= 0; # 0 = full, 1 = sparse <- not really used
 	
 	my $neuronType						= 1; # 0 = discrete, 1 = continuous
-    my $learningRule					= 1; # 0 = trace, 1 = hebb
+    my $learningRule					= 0; # 0 = trace, 1 = hebb
     
     my $nrOfEpochs						= 2;
     my $saveNetworkAtEpochMultiple 		= 99;
-	my $outputAtTimeStepMultiple		= 101;
+	my $outputAtTimeStepMultiple		= 3;
 	
-    my $lateralInteraction				= 0; # 0 = none, 1 = COMP, 2 = SOM
+    my $lateralInteraction				= 1; # 0 = none, 1 = COMP, 2 = SOM
     my $resetTrace						= "true"; # "false", Reset trace between objects of training
     my $resetActivity					= "true"; # "false", Reset activation between objects of training
     
@@ -68,7 +68,7 @@
     
     my @timeConstants					= ( 
     									#["0.050"],
-    									["0.500"]
+    									["0.100"]
     									);
     die "Invalid array: timeConstants" if !validateArray(\@timeConstants);
  	
