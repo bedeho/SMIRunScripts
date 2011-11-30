@@ -25,7 +25,7 @@
 	my $experiment 						= "test";
 	my $stimuliTraining 				= "simple_training";
 	my $stimuliTesting 					= "simple_testing"; # add support for multiple
-	my $xgrid 							= "0"; # "0" = false, "1" = true
+	my $xgrid 							= "1"; # "0" = false, "1" = true
 	my $nrOfEyePositionsInTesting		= "3";
 	
 	# FIXED PARAMS - non permutable
@@ -41,11 +41,13 @@
 	my $neuronType						= 1; # 0 = discrete, 1 = continuous
     my $learningRule					= 0; # 0 = trace, 1 = hebb
     
-    my $nrOfEpochs						= 2;
-    my $saveNetworkAtEpochMultiple 		= 99;
+    my $nrOfEpochs						= 200;
+    my $saveNetworkAtEpochMultiple 		= 50;
 	my $outputAtTimeStepMultiple		= 3;
 	
-    my $lateralInteraction				= 1; # 0 = none, 1 = COMP, 2 = SOM
+    my $lateralInteraction				= 0; # 0 = NONE, 1 = COMP, 2 = SOM
+    my $sparsenessRoutine				= 1; # 0 = NONE, 1 = HEAP
+    
     my $resetTrace						= "true"; # "false", Reset trace between objects of training
     my $resetActivity					= "true"; # "false", Reset activation between objects of training
     
@@ -54,32 +56,40 @@
     # Notice, layer one needs 3x because of small filter magnitudes, and 5x because of
     # number of afferent synapses, total 15x.
     my @learningRates 					= (
-    									#["0.0100"],
+    									["0.0001"],
+    									["0.0010"],
+    									["0.0100"],
     									["0.1000"]
     									);
     									
  	die "Invalid array: learningRates" if !validateArray(\@learningRates);
 
-    my @sparsenessLevels				= ( 
-    									["0.90"]
-    									#["0.95"]
+    my @sparsenessLevels				= (
+    									["0.70"],
+    									["0.75"],
+    									["0.80"], 
+    									["0.85"],
+    									["0.95"],
+    									["0.99"]
     									);
     die "Invalid array: sparsenessLevels" if !validateArray(\@sparsenessLevels);
     
-    my @timeConstants					= ( 
-    									#["0.050"],
-    									["0.100"]
+    my @timeConstants					= (
+    									["0.050"], 
+    									["0.100"],
+    									["0.200"],
+    									["0.400"]
     									);
     die "Invalid array: timeConstants" if !validateArray(\@timeConstants);
  	
-    my @stepSizeFraction				= ("0.5");  #0.1 = 1/10, 0.05 = 1/20, 0.02 = 1/50
+    my @stepSizeFraction				= ("0.5","0.1");  #0.1 = 1/10, 0.05 = 1/20, 0.02 = 1/50
     die "Invalid array: stepSizeFraction" if !validateArray(\@stepSizeFraction);
     
-    my @traceTimeConstant				= ("1.500"); #("0.100", "0.050", "0.010")
+    my @traceTimeConstant				= ("0.050","0.100","0.500","1.500","2.500"); #("0.100", "0.050", "0.010")
 	die "Invalid array: traceTimeConstant" if !validateArray(\@traceTimeConstant);
 	
     my $pathWayLength					= 1;
-    my @dimension						= (32);
+    my @dimension						= (10);
     my @depth							= (1);
     my @fanInRadius 					= (6); # not used
     my @fanInCount 						= (100); # not used
@@ -87,7 +97,7 @@
     my @eta								= ("0.8");
     my @timeConstant					= ("0.1"); # < === is permuted below
     my @sparsenessLevel					= ("0.1"); # < === is permuted below
-    my @sigmoidSlope 					= ("5.0");
+    my @sigmoidSlope 					= ("1.0");
     my @inhibitoryRadius				= ("6.0");
     my @inhibitoryContrast				= ("1.4");
    	my @somExcitatoryRadius				= ("0.6");
@@ -161,13 +171,7 @@
 		
 		# Make experiment folder
 		mkdir($experimentFolder);
-		
-		# Copy file list to experiment folder, if this is xgrid run
-		copy($stimuliFolder."FileList.txt", $experimentFolder."FileList.txt") or die "Cannot make copy of file list: $!\n" if ($#ARGV >= 2 && $ARGV[2] eq "xgrid");
-		
-		# Copy VisBack binary, if this is xgrid run
-        copy($PROGRAM, $experimentFolder."VisBack") or die "Cannot make copy of binary: $!\n" if ($#ARGV >= 2 && $ARGV[2] eq "xgrid");
-		
+
 		######################################
 		# Make blank network #################
 		
@@ -202,9 +206,8 @@
         # Make simulation file
         open (SIMULATIONS_FILE, '>'.$experimentFolder.'simulations.txt') or die "Could not open file '${experimentFolder}simulations.txt'. $!\n";
         
-        # Only do on making folder ?
-        ## Copy VisBack binary
-        ##copy($PROGRAM, $experimentFolder."VisBack") or die "Cannot make copy of binary: $!\n";
+        # Copy SMI binary, if this is xgrid run
+		copy($PROGRAM, $experimentFolder.$BINARY) or die "Cannot make copy of binary: $!\n" if ($xgrid);
                 
         # Make result directory
         mkdir($xgridResult);
@@ -448,14 +451,15 @@ training: {
 
 /*
 * Connectivity between regions
-* 0 = full, 1 = sparse
+* 0 = full
+* 1 = sparse
 */
 connectivity = $connectivity;
 
 /*
 * Only used in build command:
-* No feedback = 0, 
-* symmetric feedback = 1, 
+* No feedback = 0 
+* symmetric feedback = 1 
 * probabilistic feedback = 2
 */
 feedback = 0;
@@ -463,31 +467,32 @@ feedback = 0;
 /*
 * Only used in build command:
 * The initial weight set on synapses
-* 0 = zero, 
-* 1 = same [0,1] uniform random weight used feedbackorward&backward,
+* 0 = zero 
+* 1 = same [0,1] uniform random weight used feedbackorward&backward
 * 2 = two independent [0,1] uniform random weights used forward&backward
 */
 initialWeight = 1;
 
 /*
 * What type of weight normalization will be applied after learning.
-* 0 = NONE, 
+* 0 = NONE
 * 1 = CLASSIC
 */
 weightNormalization = 1;
 
 /*
 * What type of sparsification routine to apply.
-* 0 = NONE, 
+* 0 = NONE 
 * 1 = HEAP
 */
-sparsenessRoutine = 1;
+sparsenessRoutine = $sparsenessRoutine;
 
 /*
 * What type of lateral interaction to use.
-* 0 = NONE, 
-* 1 = COMP, 
-* 2 = SOM
+* 0 = NONE
+* 1 = GLOBAL 
+* 2 = COMP
+* 3 = SOM
 */
 lateralInteraction = $lateralInteraction;
 

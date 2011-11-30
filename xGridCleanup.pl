@@ -38,7 +38,14 @@
 	} else {
         die "No stimuli name provided\n";
 	}
-
+	
+	my $nrOfEyePositionsInTesting;
+	if($#ARGV >= 2) {
+        $nrOfEyePositionsInTesting = $ARGV[2];
+	} else {
+        die "No eye position name provided\n";
+	}
+	
     my $experimentFolder 		= $BASE."Experiments/".$experiment."/";
     my $experimentFolderBackup	= $BASE."Experiments/".$experiment."_backup/";
     
@@ -100,4 +107,4 @@
 	}
 	
 	# Call matlab to plot all
-	system($MATLAB . " -r \"cd('$MATLAB_SCRIPT_FOLDER');plotExperimentInvariance('$experiment');\"");
+	system($MATLAB . " -r \"cd('$MATLAB_SCRIPT_FOLDER');plotExperiment('$experiment',$nrOfEyePositionsInTesting);\"");
