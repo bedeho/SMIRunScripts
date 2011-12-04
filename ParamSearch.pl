@@ -22,7 +22,7 @@
     ################################################################################################################################################################################################
 	
 	# Run values
-	my $experiment 						= "test";
+	my $experiment 						= "retry";
 	my $stimuliTraining 				= "simple_training";
 	my $stimuliTesting 					= "simple_testing"; # add support for multiple
 	my $xgrid 							= "1"; # "0" = false, "1" = true
@@ -41,8 +41,8 @@
 	my $neuronType						= 1; # 0 = discrete, 1 = continuous
     my $learningRule					= 0; # 0 = trace, 1 = hebb
     
-    my $nrOfEpochs						= 200;
-    my $saveNetworkAtEpochMultiple 		= 50;
+    my $nrOfEpochs						= 100;
+    my $saveNetworkAtEpochMultiple 		= 35;
 	my $outputAtTimeStepMultiple		= 3;
 	
     my $lateralInteraction				= 0; # 0 = NONE, 1 = COMP, 2 = SOM
@@ -56,9 +56,9 @@
     # Notice, layer one needs 3x because of small filter magnitudes, and 5x because of
     # number of afferent synapses, total 15x.
     my @learningRates 					= (
-    									["0.0001"],
+    									#["0.0001"],
     									["0.0010"],
-    									["0.0100"],
+    									#["0.0100"],
     									["0.1000"]
     									);
     									
@@ -66,23 +66,23 @@
 
     my @sparsenessLevels				= (
     									["0.70"],
-    									["0.75"],
+    									#["0.75"],
     									["0.80"], 
-    									["0.85"],
+    									#["0.85"],
     									["0.95"],
-    									["0.99"]
+    									#["0.99"]
     									);
     die "Invalid array: sparsenessLevels" if !validateArray(\@sparsenessLevels);
     
     my @timeConstants					= (
-    									["0.050"], 
-    									["0.100"],
-    									["0.200"],
-    									["0.400"]
+    									["0.050"] 
+    									#["0.100"],
+    									#["0.200"],
+    									#["0.400"]
     									);
     die "Invalid array: timeConstants" if !validateArray(\@timeConstants);
  	
-    my @stepSizeFraction				= ("0.5","0.1");  #0.1 = 1/10, 0.05 = 1/20, 0.02 = 1/50
+    my @stepSizeFraction				= ("0.5");  #0.1 = 1/10, 0.05 = 1/20, 0.02 = 1/50
     die "Invalid array: stepSizeFraction" if !validateArray(\@stepSizeFraction);
     
     my @traceTimeConstant				= ("0.050","0.100","0.500","1.500","2.500"); #("0.100", "0.050", "0.010")
