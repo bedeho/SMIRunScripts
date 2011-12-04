@@ -145,10 +145,10 @@
 		my $destinationFolder = $simulationFolder.$newFolder;
 		
 	   	if(!(-d $destinationFolder)) {
-			print "Making result directory $destinationFolder \n";
+			print "Making result directory… \n";
 			mkdir($destinationFolder, 0777) || print $!;
 	    } else {
-	    	die "Result directory already exists\n";
+	    	die "Result directory already exists: $destinationFolder \n";
 	    }
 	    
 	    # Move result files into result folder

@@ -22,10 +22,10 @@
     ################################################################################################################################################################################################
 	
 	# Run values
-	my $experiment 						= "retry";
+	my $experiment 						= "test2";
 	my $stimuliTraining 				= "simple_training";
 	my $stimuliTesting 					= "simple_testing"; # add support for multiple
-	my $xgrid 							= "1"; # "0" = false, "1" = true
+	my $xgrid 							= "0"; # "0" = false, "1" = true
 	my $nrOfEyePositionsInTesting		= "3";
 	
 	# FIXED PARAMS - non permutable
@@ -41,7 +41,7 @@
 	my $neuronType						= 1; # 0 = discrete, 1 = continuous
     my $learningRule					= 0; # 0 = trace, 1 = hebb
     
-    my $nrOfEpochs						= 100;
+    my $nrOfEpochs						= 1;
     my $saveNetworkAtEpochMultiple 		= 35;
 	my $outputAtTimeStepMultiple		= 3;
 	
@@ -57,7 +57,7 @@
     # number of afferent synapses, total 15x.
     my @learningRates 					= (
     									#["0.0001"],
-    									["0.0010"],
+    									#["0.0010"],
     									#["0.0100"],
     									["0.1000"]
     									);
@@ -65,11 +65,11 @@
  	die "Invalid array: learningRates" if !validateArray(\@learningRates);
 
     my @sparsenessLevels				= (
-    									["0.70"],
+    									#["0.70"],
     									#["0.75"],
-    									["0.80"], 
+    									#["0.80"], 
     									#["0.85"],
-    									["0.95"],
+    									["0.95"]#
     									#["0.99"]
     									);
     die "Invalid array: sparsenessLevels" if !validateArray(\@sparsenessLevels);
@@ -85,7 +85,7 @@
     my @stepSizeFraction				= ("0.5");  #0.1 = 1/10, 0.05 = 1/20, 0.02 = 1/50
     die "Invalid array: stepSizeFraction" if !validateArray(\@stepSizeFraction);
     
-    my @traceTimeConstant				= ("0.050","0.100","0.500","1.500","2.500"); #("0.100", "0.050", "0.010")
+    my @traceTimeConstant				= ("0.050"); #,"0.100","0.500","1.500","2.500"); #("0.100", "0.050", "0.010")
 	die "Invalid array: traceTimeConstant" if !validateArray(\@traceTimeConstant);
 	
     my $pathWayLength					= 1;
@@ -167,36 +167,44 @@
     my $untrainedNet 			= $experimentFolder."BlankNetwork.txt";
     
     # Check if experiment folder exists
-	if(not -d $experimentFolder) {
+	if(-d $experimentFolder) {
 		
-		# Make experiment folder
-		mkdir($experimentFolder);
+		print "Experiment folder already exists, do you want to remove it ? (y/n): ";
+		my $input = <STDIN>;
+		chomp($input); # remove trailing CR
 
-		######################################
-		# Make blank network #################
-		
-			# Make temporary parameter file
-			my $tmpParameterFile = $experimentFolder."Parameters.txt";
-			my $paramResult = makeParameterFile(\@esRegionSettings, "0.1", "0.1", "0.1");
-			open (PARAMETER_FILE, '>'.$tmpParameterFile) or die "Could not open file '$tmpParameterFile'. $!\n";
-			print PARAMETER_FILE $paramResult;
-			close (PARAMETER_FILE);
-			
-			# Run build command
-			system($PERL_RUN_SCRIPT, "build", $experiment) == 0 or exit;
-			
-			# Remove temporary file
-			unlink($tmpParameterFile);
-			
-			# Copy source code as backup
-			# Gives tons of error messages
-			#system "cp -R $sourceFolder ${BASE}Experiments/${experiment}" or die "Make source copy: $!\n";
-			
-		# Make blank network #################
-		######################################
+		if($input eq "y") {
+			system("rm -r $experimentFolder");
+		} else {
+			die("Well played.\n"); 
+		}
 	}
+    
+	# Make experiment folder
+	mkdir($experimentFolder);
+	
+	# Make blank network #################
+		
+		# Make temporary parameter file
+		my $tmpParameterFile = $experimentFolder."Parameters.txt";
+		my $paramResult = makeParameterFile(\@esRegionSettings, "0.1", "0.1", "0.1");
+		open (PARAMETER_FILE, '>'.$tmpParameterFile) or die "Could not open file '$tmpParameterFile'. $!\n";
+		print PARAMETER_FILE $paramResult;
+		close (PARAMETER_FILE);
+		
+		# Run build command
+		system($PERL_RUN_SCRIPT, "build", $experiment) == 0 or exit;
+		
+		# Remove temporary file
+		unlink($tmpParameterFile);
+			
+		# Copy source code as backup
+		# Gives tons of error messages
+		#system "cp -R $sourceFolder ${BASE}Experiments/${experiment}" or die "Make source copy: $!\n";
+			
+	# Make blank network #################
 
-	# Make xgrid file, simulation file, xgrid result folder
+	# Prepare for xgrid
 	if($xgrid) {
 		
         # Make xgrid file
@@ -213,7 +221,7 @@
         mkdir($xgridResult);
 	}
 	
-	# Copy blank network into folder so that we can do control test automatically
+	# Make copy of this script as summary of parameter space explored
     my $thisScript = abs_path($0);
 	copy($thisScript, $experimentFolder."ParametersCopy.pl") or die "Cannot make copy of parameter file: $!\n";
     ################################################################################################################################################################################################

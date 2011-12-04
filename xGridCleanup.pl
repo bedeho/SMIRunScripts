@@ -91,7 +91,7 @@
 		system("tar -xjf ${experimentFolder}${i}/result.tbz -C ${experimentFolder}${i}") == 0 or die "Could not untar ${experimentFolder}${i}/result.tbz: $!\n";
 		
 		# Move results into /Training
-		system("mv ${experimentFolder}${i}/*.dat ${experimentFolder}${i}/Training") == 0 or die "Moving result files into training folder failed: $!\n";
+		system("mv ${experimentFolder}${i}/*.dat ${experimentFolder}${i}/Training") == 0 or print "Unable to save training data: $!\n";
 		
 		# Copy blank network into folder so that we can do control test automatically
 		my $blankNetworkSRC = $experimentFolder."BlankNetwork.txt";
