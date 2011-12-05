@@ -41,7 +41,7 @@
 	my $neuronType						= 1; # 0 = discrete, 1 = continuous
     my $learningRule					= 0; # 0 = trace, 1 = hebb
     
-    my $nrOfEpochs						= 1;
+    my $nrOfEpochs						= 10;
     my $saveNetworkAtEpochMultiple 		= 35;
 	my $outputAtTimeStepMultiple		= 3;
 	
@@ -57,8 +57,8 @@
     # number of afferent synapses, total 15x.
     my @learningRates 					= (
     									#["0.0001"],
-    									#["0.0010"],
-    									#["0.0100"],
+    									["0.0010"],
+    									["0.0100"],
     									["0.1000"]
     									);
     									
@@ -69,8 +69,8 @@
     									#["0.75"],
     									#["0.80"], 
     									#["0.85"],
-    									["0.95"]#
-    									#["0.99"]
+    									#["0.95"]#
+    									["0.99"]
     									);
     die "Invalid array: sparsenessLevels" if !validateArray(\@sparsenessLevels);
     
@@ -85,7 +85,7 @@
     my @stepSizeFraction				= ("0.5");  #0.1 = 1/10, 0.05 = 1/20, 0.02 = 1/50
     die "Invalid array: stepSizeFraction" if !validateArray(\@stepSizeFraction);
     
-    my @traceTimeConstant				= ("0.050"); #,"0.100","0.500","1.500","2.500"); #("0.100", "0.050", "0.010")
+    my @traceTimeConstant				= ("0.000001","1.500"); #,"0.100","0.500","1.500","2.500"); #("0.100", "0.050", "0.010")
 	die "Invalid array: traceTimeConstant" if !validateArray(\@traceTimeConstant);
 	
     my $pathWayLength					= 1;
