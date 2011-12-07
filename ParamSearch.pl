@@ -22,7 +22,7 @@
     ################################################################################################################################################################################################
 	
 	# Run values
-	my $experiment 						= "test2";
+	my $experiment 						= "fanIn20";
 	my $stimuliTraining 				= "simple_training";
 	my $stimuliTesting 					= "simple_testing"; # add support for multiple
 	my $xgrid 							= "0"; # "0" = false, "1" = true
@@ -36,41 +36,72 @@
 	my $horVisualFieldSize				= "200.0";
 	my $horEyePositionFieldSize			= "125.0";
 	
-	my $connectivity					= 0; # 0 = full, 1 = sparse <- not really used
+	my $connectivity					= 1; # 0 = full, 1 = sparse <- not really used
 	
 	my $neuronType						= 1; # 0 = discrete, 1 = continuous
     my $learningRule					= 0; # 0 = trace, 1 = hebb
     
-    my $nrOfEpochs						= 10;
-    my $saveNetworkAtEpochMultiple 		= 35;
+    my $nrOfEpochs						= 30;
+    my $saveNetworkAtEpochMultiple 		= 16;
 	my $outputAtTimeStepMultiple		= 3;
 	
     my $lateralInteraction				= 0; # 0 = NONE, 1 = COMP, 2 = SOM
     my $sparsenessRoutine				= 1; # 0 = NONE, 1 = HEAP
     
-    my $resetTrace						= "true"; # "false", Reset trace between objects of training
+    my $resetTrace						= "false"; # "false", Reset trace between objects of training
     my $resetActivity					= "true"; # "false", Reset activation between objects of training
     
     # RANGE PARAMS - permutable
     
+    my @sigmoidSlopes					= (
+										#["01.0"],
+										#["10.0"],
+										#["20.0"],
+										#["30.0"],
+										#["40.0"],
+										#["50.0"],
+										#["60.0"],
+										#["70.0"],
+										["100.0"]
+    									);
+    die "Invalid array: sigmoidSlopes" if !validateArray(\@sigmoidSlopes);
+    
+    # Not easily implementable due to a variety of issues
+    #my @fanInCountPercentages			= (
+	#									["0.01"],
+	#									["0.10"],
+	#									#["0.20"],
+	#									["0.40"],
+	#									#["0.60"],
+	#									["0.70"]
+	#									#["0.80"]
+    #									);
+    #die "Invalid array: fanInCountPercentages" if !validateArray(\@fanInCountPercentages);
+    
     # Notice, layer one needs 3x because of small filter magnitudes, and 5x because of
     # number of afferent synapses, total 15x.
     my @learningRates 					= (
-    									#["0.0001"],
-    									["0.0010"],
-    									["0.0100"],
-    									["0.1000"]
-    									);
-    									
+										#["0.0200"],
+										#["0.0300"],
+										#["0.0400"],
+										#["0.0500"],
+										#["0.0600"],
+										["0.0700"],
+										#["0.0800"],
+										#["0.0900"],
+										 ["0.1000"]
+    									);								
  	die "Invalid array: learningRates" if !validateArray(\@learningRates);
 
     my @sparsenessLevels				= (
-    									#["0.70"],
-    									#["0.75"],
+    									#["0.65"],
+    									["0.75"],
     									#["0.80"], 
-    									#["0.85"],
-    									#["0.95"]#
-    									["0.99"]
+    									["0.85"],
+    									["0.90"],
+    									#["0.93"],
+										["0.96"]
+										#["0.97"]
     									);
     die "Invalid array: sparsenessLevels" if !validateArray(\@sparsenessLevels);
     
@@ -85,19 +116,19 @@
     my @stepSizeFraction				= ("0.5");  #0.1 = 1/10, 0.05 = 1/20, 0.02 = 1/50
     die "Invalid array: stepSizeFraction" if !validateArray(\@stepSizeFraction);
     
-    my @traceTimeConstant				= ("0.000001","1.500"); #,"0.100","0.500","1.500","2.500"); #("0.100", "0.050", "0.010")
+    my @traceTimeConstant				= ("1.500"); #,"0.100","0.500","1.500","2.500"); #("0.100", "0.050", "0.010")
 	die "Invalid array: traceTimeConstant" if !validateArray(\@traceTimeConstant);
 	
     my $pathWayLength					= 1;
     my @dimension						= (10);
     my @depth							= (1);
     my @fanInRadius 					= (6); # not used
-    my @fanInCount 						= (100); # not used
+    my @fanInCountPercentage 			= ("0.6");
     my @learningrate					= ("0.1"); # < === is permuted below
     my @eta								= ("0.8");
     my @timeConstant					= ("0.1"); # < === is permuted below
     my @sparsenessLevel					= ("0.1"); # < === is permuted below
-    my @sigmoidSlope 					= ("1.0");
+    my @sigmoidSlope 					= ("30.0"); # < === is permuted below
     my @inhibitoryRadius				= ("6.0");
     my @inhibitoryContrast				= ("1.4");
    	my @somExcitatoryRadius				= ("0.6");
@@ -116,7 +147,7 @@
     	$pathWayLength != scalar(@dimension) || 
     	$pathWayLength != scalar(@depth) || 
     	$pathWayLength != scalar(@fanInRadius) || 
-    	$pathWayLength != scalar(@fanInCount) || 
+    	$pathWayLength != scalar(@fanInCountPercentage) || 
     	$pathWayLength != scalar(@learningrate) || 
     	$pathWayLength != scalar(@eta) || 
     	$pathWayLength != scalar(@timeConstant) ||
@@ -138,7 +169,7 @@
      	my %region   	= ('dimension'       	=>      $dimension[$r],
                          'depth'             	=>      $depth[$r],
                          'fanInRadius'       	=>      $fanInRadius[$r],
-                         'fanInCount'        	=>      $fanInCount[$r],
+                         'fanInCountPercentage' =>      $fanInCountPercentage[$r],
                          'learningrate'      	=>      $learningrate[$r],
                          'eta'               	=>      $eta[$r],
                          'timeConstant'      	=>      $timeConstant[$r],
@@ -183,27 +214,22 @@
 	# Make experiment folder
 	mkdir($experimentFolder);
 	
+    # Make blank network #################
+	
+	# Make temporary parameter file
+	my $tmpParameterFile = $experimentFolder."Parameters.txt";
+	my $paramResult = makeParameterFile(\@esRegionSettings, "0.1", "0.1", "0.1");
+	open (PARAMETER_FILE, '>'.$tmpParameterFile) or die "Could not open file '$tmpParameterFile'. $!\n";
+	print PARAMETER_FILE $paramResult;
+	close (PARAMETER_FILE);
+	
+	# Run build command
+	system($PERL_RUN_SCRIPT, "build", $experiment) == 0 or exit;
+	
+	# Remove temporary file
+	unlink($tmpParameterFile);	
 	# Make blank network #################
-		
-		# Make temporary parameter file
-		my $tmpParameterFile = $experimentFolder."Parameters.txt";
-		my $paramResult = makeParameterFile(\@esRegionSettings, "0.1", "0.1", "0.1");
-		open (PARAMETER_FILE, '>'.$tmpParameterFile) or die "Could not open file '$tmpParameterFile'. $!\n";
-		print PARAMETER_FILE $paramResult;
-		close (PARAMETER_FILE);
-		
-		# Run build command
-		system($PERL_RUN_SCRIPT, "build", $experiment) == 0 or exit;
-		
-		# Remove temporary file
-		unlink($tmpParameterFile);
-			
-		# Copy source code as backup
-		# Gives tons of error messages
-		#system "cp -R $sourceFolder ${BASE}Experiments/${experiment}" or die "Make source copy: $!\n";
-			
-	# Make blank network #################
-
+	
 	# Prepare for xgrid
 	if($xgrid) {
 		
@@ -219,6 +245,10 @@
                 
         # Make result directory
         mkdir($xgridResult);
+        
+        # Copy source code as backup
+		# Gives tons of error messages
+		#system "cp -R $sourceFolder ${BASE}Experiments/${experiment}" or die "Make source copy: $!\n";
 	}
 	
 	# Make copy of this script as summary of parameter space explored
@@ -228,21 +258,27 @@
     # Permuting
     ################################################################################################################################################################################################
     
+    for my $sS (@sigmoidSlopes) {
+    #for my $ficP (@fanInCountPercentages) {
 	for my $tC (@timeConstants) {
-		for my $sSF (@stepSizeFraction) {
-			for my $ttC (@traceTimeConstant) {
-				for my $l (@learningRates) {
-					for my $s (@sparsenessLevels) {
+	for my $sSF (@stepSizeFraction) {
+	for my $ttC (@traceTimeConstant) {
+	for my $l (@learningRates) {
+	for my $s (@sparsenessLevels) {
 						
 						# Layer spesific parameters
-						my @learningRateArray = @{ $l };
-						my @sparsityArray = @{ $s };
-						my @timeConstantArray = @{ $tC };
+						my @sigmoidSlopeArray 			= @{ $sS };
+						#my @fanInCountPercentageArray 	= @{ $ficP };
+						my @timeConstantArray 			= @{ $tC };
+						my @learningRateArray 			= @{ $l };
+						my @sparsityArray 				= @{ $s };
 						
-						print "Uneven parameter length found while permuting." if 
+						print "Uneven parameter length found while permuting." if
+							$pathWayLength != scalar(@sigmoidSlopeArray) ||
+							#$pathWayLength != scalar(@fanInCountPercentageArray) ||
+							$pathWayLength != scalar(@timeConstantArray) ||
    							$pathWayLength != scalar(@learningRateArray) || 
-   							$pathWayLength != scalar(@sparsityArray) || 
-   							$pathWayLength != scalar(@timeConstantArray);
+   							$pathWayLength != scalar(@sparsityArray);
 						
 						# Smallest eta value, it is used with ssF
 						my $layerCounter = 0;
@@ -250,9 +286,11 @@
 						
 						for my $region ( @esRegionSettings ) {
 							
-							$region->{'learningrate'} = $learningRateArray[$layerCounter];
-							$region->{'sparsenessLevel'} = $sparsityArray[$layerCounter];
-							$region->{'timeConstant'} = $timeConstantArray[$layerCounter];
+							$region->{'sigmoidSlope'} 			= $sigmoidSlopeArray[$layerCounter];
+							#$region->{'fanInCountPercentage'} 	= $fanInCountPercentageArray[$layerCounter];
+							$region->{'timeConstant'} 			= $timeConstantArray[$layerCounter];
+							$region->{'learningrate'} 			= $learningRateArray[$layerCounter];
+							$region->{'sparsenessLevel'} 		= $sparsityArray[$layerCounter];
 							
 							# Find the smallest eta, it is the what sSF is calculated out of
 							$minTc = $region->{'timeConstant'} if $minTc > $region->{'timeConstant'};
@@ -260,15 +298,21 @@
 							$layerCounter++;
 						}
 						
+						my $sSPstr = "@sigmoidSlopeArray";
+						$sSPstr =~ s/\s/-/g;
+												
+						#my $ficPstr = "@fanInCountPercentageArray";
+						#$ficPstr =~ s/\s/-/g;
+						
+						my $tCstr = "@timeConstantArray";
+						$tCstr =~ s/\s/-/g;
+						
 						my $Lstr = "@learningRateArray";
 						$Lstr =~ s/\s/-/g;
 						
 						my $Sstr = "@sparsityArray";
 						$Sstr =~ s/\s/-/g;
-						
-						my $tCstr = "@timeConstantArray";
-						$tCstr =~ s/\s/-/g;
-						
+
 						# Build name so that only varying parameters are included.
 						my $simulationCode = "";
 						$simulationCode .= "tC=${tCstr}_" if ($neuronType == 1) && scalar(@timeConstants) > 1;
@@ -276,12 +320,14 @@
 						$simulationCode .= "ttC=${ttC}_" if ($neuronType == 1) && scalar(@traceTimeConstant) > 1;
 						$simulationCode .= "L=${Lstr}_" if scalar(@learningRates) > 1;
 						$simulationCode .= "S=${Sstr}_" if scalar(@sparsenessLevels) > 1;
+						#$simulationCode .= "F=${ficPstr}_" if scalar(@fanInCountPercentages) > 1;
+						$simulationCode .= "sS=${sSPstr}_" if scalar(@sigmoidSlopes) > 1;
 						
 						# If there is only a single parameter combination being explored, then just give a long precise name,
 						# it's essentially not a parameter search.
 						if($simulationCode eq "") {
 							$simulationCode = "tC=${tCstr}_sSF=${sSF}_ttC=${ttC}_" if ($neuronType == 1);
-							$simulationCode = "L=${Lstr}_S=${Sstr}_";
+							$simulationCode = "L=${Lstr}_S=${Sstr}_sS=${sSPstr}_"; #_F=${ficPstr}
 						}
 						
 						if($xgrid) {
@@ -346,10 +392,12 @@
 							}
 						}
 					}
-				}
-			}
-		}
 	}
+	}
+	}
+	}
+   # }
+    }
 	
 	# If we just setup xgrid parameter search
 	if($xgrid) {
@@ -528,27 +576,27 @@ area7a: {
 	/*
 	* The distance between consecutive neuron preferences in eye position space
 	*/	
-	   eyePositionPrefrerenceDistance = $eyePositionPrefrerenceDistance;
-	         
-	   /*
-	   * Size of visual field in degrees
-	   */
-	   horVisualFieldSize = $horVisualFieldSize;
-	   
-	   /*
-	   * Size of movement field in degrees
-	   */
-	   horEyePositionFieldSize = $horEyePositionFieldSize;
-	   
-	   /*
-	   * Spread of gaussian component
-	   */
-	   gaussianSigma = $gaussianSigma; 
-	   
-	   /*
-	   * Slope of eye position sigmoid component
-	   */
-	   sigmoidSlope = $sigmoidSlope;
+	eyePositionPrefrerenceDistance = $eyePositionPrefrerenceDistance;
+	      
+	/*
+	* Size of visual field in degrees
+	*/
+	horVisualFieldSize = $horVisualFieldSize;
+	
+	/*
+	* Size of movement field in degrees
+	*/
+	horEyePositionFieldSize = $horEyePositionFieldSize;
+	
+	/*
+	* Spread of gaussian component
+	*/
+	gaussianSigma = $gaussianSigma; 
+	
+	/*
+	* Slope of eye position sigmoid component
+	*/
+	sigmoidSlope = $sigmoidSlope;
 };
 
 extrastriate: (
@@ -562,7 +610,7 @@ TEMPLATE
 			$str .= "\tdimension         		= ". $tmp{"dimension"} .";\n";
 			$str .= "\tdepth             		= ". $tmp{"depth"} .";\n";
 			$str .= "\tfanInRadius       		= ". $tmp{"fanInRadius"} .";\n";
-			$str .= "\tfanInCount        		= ". $tmp{"fanInCount"} .";\n";
+			$str .= "\tfanInCountPercentage     = ". $tmp{"fanInCountPercentage"} .";\n";
 			$str .= "\tlearningrate      		= ". $tmp{"learningrate"} .";\n";
 			$str .= "\teta               		= ". $tmp{"eta"} .";\n";
 			$str .= "\ttimeConstant				= ". $tmp{"timeConstant"} .";\n";
