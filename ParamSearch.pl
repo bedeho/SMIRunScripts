@@ -22,33 +22,38 @@
     ################################################################################################################################################################################################
 	
 	# Run values
-	my $experiment 						= "fanIn20";
-	my $stimuliTraining 				= "simple_training";
-	my $stimuliTesting 					= "simple_testing"; # add support for multiple
+	my $experiment 						= "Monitor2";
+	my $stimuliTraining 				= "simple_testOnFull"; # simple_testOnFull, simple_training
+	my $stimuliTesting 					= "simple_testOnFull"; # simple_testOnFull, simple_testing
 	my $xgrid 							= "0"; # "0" = false, "1" = true
-	my $nrOfEyePositionsInTesting		= "3";
+	my $nrOfEyePositionsInTesting		= "7"; # simple_testing = 4 ? simple_TestOnTrained = 11, simple_testOnFull = 7 <=================== SUPER IMPORTANT FOR PROPER ANALYSIS, WILL NOT CRASH WITH WRONG NUMBER!!
 	
 	# FIXED PARAMS - non permutable
 	my $visualPreferenceDistance		= "2.0";
 	my $eyePositionPrefrerenceDistance	= "2.0";
-	my $gaussianSigma					= "5.0";
-	my $sigmoidSlope					= "0.5";
+	my $gaussianSigma					= "1.0";
+	my $sigmoidSlope					= "20.0";
 	my $horVisualFieldSize				= "200.0";
 	my $horEyePositionFieldSize			= "125.0";
 	
-	my $connectivity					= 1; # 0 = full, 1 = sparse <- not really used
+	my $connectivity					= 1; # 0 = full, 1 = sparse <- not really used <- why does this say not really used ?
 	
 	my $neuronType						= 1; # 0 = discrete, 1 = continuous
-    my $learningRule					= 0; # 0 = trace, 1 = hebb
+    my $learningRule					= 1; # 0 = trace, 1 = hebb
     
-    my $nrOfEpochs						= 30;
-    my $saveNetworkAtEpochMultiple 		= 16;
-	my $outputAtTimeStepMultiple		= 3;
+    my $nrOfEpochs						= 5;
+    my $saveNetworkAtEpochMultiple 		= 11111;
+	
+	my $outputAtTimeStepMultiple		= 2;
+	
+	# only continous neurons?
+	my $outputNeurons					= "true"; # output neurons during training?, since they are always outputted during testing
+	my $outputWeights					= "true"; # output synapse history during training/testing
 	
     my $lateralInteraction				= 0; # 0 = NONE, 1 = COMP, 2 = SOM
     my $sparsenessRoutine				= 1; # 0 = NONE, 1 = HEAP
     
-    my $resetTrace						= "false"; # "false", Reset trace between objects of training
+    my $resetTrace						= "true"; # "false", Reset trace between objects of training
     my $resetActivity					= "true"; # "false", Reset activation between objects of training
     
     # RANGE PARAMS - permutable
@@ -62,7 +67,7 @@
 										#["50.0"],
 										#["60.0"],
 										#["70.0"],
-										["100.0"]
+										["60.0"]
     									);
     die "Invalid array: sigmoidSlopes" if !validateArray(\@sigmoidSlopes);
     
@@ -81,35 +86,33 @@
     # Notice, layer one needs 3x because of small filter magnitudes, and 5x because of
     # number of afferent synapses, total 15x.
     my @learningRates 					= (
-										#["0.0200"],
-										#["0.0300"],
-										#["0.0400"],
-										#["0.0500"],
-										#["0.0600"],
-										["0.0700"],
-										#["0.0800"],
-										#["0.0900"],
-										 ["0.1000"]
+										#["0.1000"],
+										#["1.0000"],
+										#["5.0000"],
+										#["10.000"],
+										["30.000"],
+										["50.000"],
+										["100.00"]
     									);								
  	die "Invalid array: learningRates" if !validateArray(\@learningRates);
 
     my @sparsenessLevels				= (
     									#["0.65"],
-    									["0.75"],
+    									#["0.75"],
     									#["0.80"], 
-    									["0.85"],
-    									["0.90"],
+    									#["0.85"],
+    									#["0.90"],
     									#["0.93"],
-										["0.96"]
-										#["0.97"]
+										#["0.95"],
+										["0.99"]
     									);
     die "Invalid array: sparsenessLevels" if !validateArray(\@sparsenessLevels);
     
     my @timeConstants					= (
-    									["0.050"] 
-    									#["0.100"],
-    									#["0.200"],
-    									#["0.400"]
+    									["0.100"] 
+    									#["0.100"]
+    									#["0.200"]
+    									#["0.500"]
     									);
     die "Invalid array: timeConstants" if !validateArray(\@timeConstants);
  	
@@ -120,10 +123,10 @@
 	die "Invalid array: traceTimeConstant" if !validateArray(\@traceTimeConstant);
 	
     my $pathWayLength					= 1;
-    my @dimension						= (10);
+    my @dimension						= (70);
     my @depth							= (1);
     my @fanInRadius 					= (6); # not used
-    my @fanInCountPercentage 			= ("0.6");
+    my @fanInCountPercentage 			= ("0.0005");
     my @learningrate					= ("0.1"); # < === is permuted below
     my @eta								= ("0.8");
     my @timeConstant					= ("0.1"); # < === is permuted below
@@ -474,9 +477,9 @@ continuous : {
 	/*
 	* Parameters controlling what values to output, what layers is governed by "output" parameter in each layer.
 	*/
-	outputNeurons = false;
-	outputWeights = false;
-	outputAtTimeStepMultiple = $outputAtTimeStepMultiple; /* Only used in training, may lead to no output!, in testing only last time step is outputted*/
+	outputNeurons = $outputNeurons;
+	outputWeights = $outputWeights;
+	outputAtTimeStepMultiple = $outputAtTimeStepMultiple; /* Only continous neurons, may lead to no output both in training and testing!*/
 };
 
 training: {
