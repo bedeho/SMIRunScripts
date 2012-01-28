@@ -22,11 +22,11 @@
     ################################################################################################################################################################################################
 	
 	# Run values
-	my $experiment 						= "TRACE-FANIN1.0-S10-s95-0.5s-4H-E13-NONE";
+	my $experiment 						= "SOM-FULL-S10-s95";
 	my $stimuliTraining 				= "0.5s-4H-E13_training"; # simple_testOnFull, simple_training
 	my $stimuliTesting 					= "0.5s-4H-E13_testOnTrained"; # simple_testOnFull, simple_testing
 	my $xgrid 							= "0"; # "0" = false, "1" = true
-	my $nrOfEyePositionsInTesting		= "4"; #  Simon test = nr of head positions, Old test = nr of eye testing locations <=================== SUPER IMPORTANT FOR PROPER ANALYSIS, WILL NOT CRASH WITH WRONG NUMBER!!
+	#my $nrOfEyePositionsInTesting		= "4"; #  Simon test = nr of head positions, Old test = nr of eye testing locations <=================== SUPER IMPORTANT FOR PROPER ANALYSIS, WILL NOT CRASH WITH WRONG NUMBER!!
 	
 	# FIXED PARAMS - non permutable
 	my $visualPreferenceDistance		= "2.0";
@@ -37,10 +37,10 @@
 	my $horVisualFieldSize				= "200.0";
 	my $horEyePositionFieldSize			= "125.0";
 	
-	my $connectivity					= 1; # 0 = full, 1 = sparse <- not really used <- why does this say not really used ?
+	my $connectivity					= 0; # 0 = full, 1 = sparse <- not really used <- why does this say not really used ?
 	
 	my $neuronType						= 1; # 0 = discrete, 1 = continuous
-    my $learningRule					= 0; # 0 = trace, 1 = hebb
+    my $learningRule					= 1; # 0 = trace, 1 = hebb
     
     my $nrOfEpochs						= 30;
     my $saveNetworkAtEpochMultiple 		= 11111;
@@ -51,7 +51,7 @@
 	my $outputNeurons					= "false"; # output neurons during training?, since they are always outputted during testing
 	my $outputWeights					= "false"; # output synapse history during training/testing
 	
-    my $lateralInteraction				= 0; # 0 = NONE, 1 = COMP, 2 = SOM
+    my $lateralInteraction				= 2; # 0 = NONE, 1 = COMP, 2 = SOM
     my $sparsenessRoutine				= 1; # 0 = NONE, 1 = HEAP
     
     my $resetTrace						= "true"; # "false", Reset trace between objects of training
@@ -68,7 +68,7 @@
 										#["50.0"],
 										#["60.0"],
 										#["70.0"],
-										["300.0","350.0"]
+										["300.0"]
     									);
     die "Invalid array: sigmoidSlopes" if !validateArray(\@sigmoidSlopes);
     
@@ -92,18 +92,18 @@
 										#["0.0100"],
 										#["0.1000"],
 										#["1.0000"],
-										#["100.00"]
+										["50.00"]
 										#["1000.0"],
 										#["10000.0"],
 										#["100000.0"],
 										#["1000000.0"]
 										#["0.000","0.1000"],
 										#["0.000","1.0000"],
-										["0.000","10.000"],
-										["0.000","50.000"],
-										["0.000","100.00"],
-										["0.000","1000.0"],
-										["0.000","10000.0"]
+										#["0.000","10.000"],
+										#["0.000","50.000"],
+										#["0.000","100.00"],
+										#["0.000","1000.0"],
+										#["0.000","10000.0"]
 										#["0.000","100000.0"]
     									);								
  	die "Invalid array: learningRates" if !validateArray(\@learningRates);
@@ -122,7 +122,7 @@
 										##["0.98","0.90"],
 										#["0.98","0.90"],
 										#["0.98","0.95"],
-										["0.98","0.95"]
+										["0.98"]
 										#["0.999","0.90"],
 										#["0.999","0.99"],
 										#["0.999"]
@@ -130,7 +130,7 @@
     die "Invalid array: sparsenessLevels" if !validateArray(\@sparsenessLevels);
     
     my @timeConstants					= (
-    									["0.100","0.100"] 
+    									["0.100"] 
     									#["0.100"]
     									#["0.200"]
     									#["0.500"]
@@ -144,23 +144,23 @@
 	die "Invalid array: traceTimeConstant" if !validateArray(\@traceTimeConstant);
 	
     my $pathWayLength					= 2;
-    my @dimension						= (10,10);
-    my @depth							= (1,1);
-    my @fanInRadius 					= (6,6); # not used
-    my @fanInCountPercentage 			= ("0.0005","1.00");
-    my @learningrate					= ("0.1","0.1"); # < === is permuted below
-    my @eta								= ("0.8","0.8");
-    my @timeConstant					= ("0.1","0.1"); # < === is permuted below
-    my @sparsenessLevel					= ("0.1","0.1"); # < === is permuted below
-    my @sigmoidSlope 					= ("30.0","30.0"); # < === is permuted below
-    my @inhibitoryRadius				= ("6.0","6.0");
-    my @inhibitoryContrast				= ("1.4","1.4");
-   	my @somExcitatoryRadius				= ("0.6","0.6");
-    my @somExcitatoryContrast			= ("120.12","120.12");
-   	my @somInhibitoryRadius				= ("6.0","6.0");
-    my @somInhibitoryContrast			= ("1.4","1.4");
-    my @filterWidth						= (7,7);
-    my @epochs							= (10,10); # only used in discrete model
+    my @dimension						= (30);
+    my @depth							= (1);
+    my @fanInRadius 					= (6); # not used
+    my @fanInCountPercentage 			= ("0.1");
+    my @learningrate					= ("0.1"); # < === is permuted below
+    my @eta								= ("0.8");
+    my @timeConstant					= ("0.1"); # < === is permuted below
+    my @sparsenessLevel					= ("0.1"); # < === is permuted below
+    my @sigmoidSlope 					= ("30.0"); # < === is permuted below
+    my @inhibitoryRadius				= ("6.0");
+    my @inhibitoryContrast				= ("1.4");
+   	my @somExcitatoryRadius				= ("0.6");
+    my @somExcitatoryContrast			= ("120.12");
+   	my @somInhibitoryRadius				= ("6.0");
+    my @somInhibitoryContrast			= ("1.4");
+    my @filterWidth						= (7);
+    my @epochs							= (10); # only used in discrete model
     
     ################################################################################################################################################################################################
     # Preprocessing
@@ -440,7 +440,7 @@
 	}
 	else {
 		# Call matlab to plot all
-		system($MATLAB . " -r \"cd('$MATLAB_SCRIPT_FOLDER');plotExperiment('$experiment',$nrOfEyePositionsInTesting);\"");	
+		system($MATLAB . " -r \"cd('$MATLAB_SCRIPT_FOLDER');plotExperiment('$experiment','$stimuliTesting');\"");	
 	}
 	
 	sub makeParameterFile {

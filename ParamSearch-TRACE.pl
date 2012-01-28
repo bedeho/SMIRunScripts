@@ -26,7 +26,7 @@
 	my $stimuliTraining 				= "0.5s-4H-E13_training"; # simple_testOnFull, simple_training
 	my $stimuliTesting 					= "0.5s-4H-E13_testOnTrained"; # simple_testOnFull, simple_testing
 	my $xgrid 							= "0"; # "0" = false, "1" = true
-	my $nrOfEyePositionsInTesting		= "4"; #  Simon test = nr of head positions, Old test = nr of eye testing locations <=================== SUPER IMPORTANT FOR PROPER ANALYSIS, WILL NOT CRASH WITH WRONG NUMBER!!
+	#my $nrOfEyePositionsInTesting		= "4"; #  Simon test = nr of head positions, Old test = nr of eye testing locations <=================== SUPER IMPORTANT FOR PROPER ANALYSIS, WILL NOT CRASH WITH WRONG NUMBER!!
 	
 	# FIXED PARAMS - non permutable
 	my $visualPreferenceDistance		= "2.0";
@@ -440,7 +440,7 @@
 	}
 	else {
 		# Call matlab to plot all
-		system($MATLAB . " -r \"cd('$MATLAB_SCRIPT_FOLDER');plotExperiment('$experiment',$nrOfEyePositionsInTesting);\"");	
+		system($MATLAB . " -r \"cd('$MATLAB_SCRIPT_FOLDER');plotExperiment('$experiment','$stimuliTesting');\"");	
 	}
 	
 	sub makeParameterFile {
