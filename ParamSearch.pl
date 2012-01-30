@@ -22,27 +22,27 @@
     ################################################################################################################################################################################################
 	
 	# Run values
-	my $experiment 						= "SOM-FULL-S10-s95";
+	my $experiment 						= "FANC0.01-FULL-S200";
 	my $stimuliTraining 				= "0.5s-4H-E13_training"; # simple_testOnFull, simple_training
 	my $stimuliTesting 					= "0.5s-4H-E13_testOnTrained"; # simple_testOnFull, simple_testing
 	my $xgrid 							= "0"; # "0" = false, "1" = true
 	#my $nrOfEyePositionsInTesting		= "4"; #  Simon test = nr of head positions, Old test = nr of eye testing locations <=================== SUPER IMPORTANT FOR PROPER ANALYSIS, WILL NOT CRASH WITH WRONG NUMBER!!
 	
 	# FIXED PARAMS - non permutable
-	my $visualPreferenceDistance		= "2.0";
-	my $eyePositionPrefrerenceDistance	= "2.0";
-	my $gaussianSigma					= "2.0";
-	my $sigmoidSlope					= "50.0"; # 50
+	my $visualPreferenceDistance		= "6.0";
+	my $eyePositionPrefrerenceDistance	= "6.0";
+	my $gaussianSigma					= "6.0";
+	my $sigmoidSlope					= "10.0"; # 50
 	
 	my $horVisualFieldSize				= "200.0";
 	my $horEyePositionFieldSize			= "125.0";
 	
-	my $connectivity					= 0; # 0 = full, 1 = sparse <- not really used <- why does this say not really used ?
+	my $connectivity					= 1; # 0 = full, 1 = sparse <- not really used <- why does this say not really used ?
 	
 	my $neuronType						= 1; # 0 = discrete, 1 = continuous
     my $learningRule					= 1; # 0 = trace, 1 = hebb
     
-    my $nrOfEpochs						= 30;
+    my $nrOfEpochs						= 1;
     my $saveNetworkAtEpochMultiple 		= 11111;
 	
 	my $outputAtTimeStepMultiple		= 5;
@@ -92,11 +92,11 @@
 										#["0.0100"],
 										#["0.1000"],
 										#["1.0000"],
-										["50.00"]
+										#["50.00"],
 										#["1000.0"],
-										#["10000.0"],
+										#["100.0"],
 										#["100000.0"],
-										#["1000000.0"]
+										["0.0"]
 										#["0.000","0.1000"],
 										#["0.000","1.0000"],
 										#["0.000","10.000"],
@@ -117,12 +117,21 @@
     									#["0.93"],
 										#["0.95"],
 										#["0.97"],
-										#["0.99"]
+										#["0.98"],
+										#["0.99"],
+										#["0.995"],
+										["0.999"],
+										#["0.97","0.97"],
+										#["0.98","0.98"],
+										#["0.99","0.99"],
+										#["0.995","0.995"],
+										#["0.999","0.999"],
+										#["0.999","0.999"]
 										##["0.98","0.85"],
 										##["0.98","0.90"],
 										#["0.98","0.90"],
 										#["0.98","0.95"],
-										["0.98"]
+										#["0.95"]
 										#["0.999","0.90"],
 										#["0.999","0.99"],
 										#["0.999"]
@@ -143,11 +152,11 @@
     my @traceTimeConstant				= ("2.500"); #,"0.100","0.500","1.500","2.500"); #("0.100", "0.050", "0.010")
 	die "Invalid array: traceTimeConstant" if !validateArray(\@traceTimeConstant);
 	
-    my $pathWayLength					= 2;
-    my @dimension						= (30);
+    my $pathWayLength					= 1;
+    my @dimension						= (200);
     my @depth							= (1);
     my @fanInRadius 					= (6); # not used
-    my @fanInCountPercentage 			= ("0.1");
+    my @fanInCountPercentage 			= ("0.01");
     my @learningrate					= ("0.1"); # < === is permuted below
     my @eta								= ("0.8");
     my @timeConstant					= ("0.1"); # < === is permuted below
