@@ -17,72 +17,47 @@
 	use myConfig;
 	use myLib;
 	
-	################################################################################################################################################################################################
-    # Input
-    ################################################################################################################################################################################################
+	#############################################################################
+	# Input
+    #############################################################################
 	
 	# Run values
 	my $experiment 						= "FANC0.01-FULL-S200";
-	my $stimuliTraining 				= "0.5s-4H-E13_training"; # simple_testOnFull, simple_training
-	my $stimuliTesting 					= "0.5s-4H-E13_testOnTrained"; # simple_testOnFull, simple_testing
-	my $xgrid 							= "0"; # "0" = false, "1" = true
-	#my $nrOfEyePositionsInTesting		= "4"; #  Simon test = nr of head positions, Old test = nr of eye testing locations <=================== SUPER IMPORTANT FOR PROPER ANALYSIS, WILL NOT CRASH WITH WRONG NUMBER!!
-	
+	my $stimuliTraining 				= "0.5s-4H-E13_training";
+	my $stimuliTesting 					= "0.5s-4H-E13_testOnTrained";
+	my $xgrid 							= XGIRD_RUN; # LOCAL_RUN, XGIRD_RUN
+
 	# FIXED PARAMS - non permutable
 	my $visualPreferenceDistance		= "6.0";
 	my $eyePositionPrefrerenceDistance	= "6.0";
 	my $gaussianSigma					= "6.0";
-	my $sigmoidSlope					= "10.0"; # 50
+	my $sigmoidSlope					= "10.0";
 	
 	my $horVisualFieldSize				= "200.0";
 	my $horEyePositionFieldSize			= "125.0";
-	
-	my $connectivity					= 1; # 0 = full, 1 = sparse <- not really used <- why does this say not really used ?
-	
-	my $neuronType						= 1; # 0 = discrete, 1 = continuous
-    my $learningRule					= 1; # 0 = trace, 1 = hebb
+
+	my $neuronType						= DISCRETE; # CONTINOUS, DISCRETE
+    my $learningRule					= HEBB; # TRACE, HEBB
     
     my $nrOfEpochs						= 1;
     my $saveNetworkAtEpochMultiple 		= 11111;
-	
 	my $outputAtTimeStepMultiple		= 5;
 	
 	# only continous neurons?
 	my $outputNeurons					= "false"; # output neurons during training?, since they are always outputted during testing
 	my $outputWeights					= "false"; # output synapse history during training/testing
 	
-    my $lateralInteraction				= 2; # 0 = NONE, 1 = COMP, 2 = SOM
-    my $sparsenessRoutine				= 1; # 0 = NONE, 1 = HEAP
+    my $lateralInteraction				= NONE; # NONE, COMP, SOM
+    my $sparsenessRoutine				= HEAP; # NONE, HEAP
     
     my $resetTrace						= "true"; # "false", Reset trace between objects of training
     my $resetActivity					= "true"; # "false", Reset activation between objects of training
     
     # RANGE PARAMS - permutable
-    
     my @sigmoidSlopes					= (
-										#["01.0"],
-										#["10.0"],
-										#["20.0"],
-										#["30.0"],
-										#["40.0"],
-										#["50.0"],
-										#["60.0"],
-										#["70.0"],
 										["300.0"]
     									);
     die "Invalid array: sigmoidSlopes" if !validateArray(\@sigmoidSlopes);
-    
-    # Not easily implementable due to a variety of issues
-    #my @fanInCountPercentages			= (
-	#									["0.01"],
-	#									["0.10"],
-	#									#["0.20"],
-	#									["0.40"],
-	#									#["0.60"],
-	#									["0.70"]
-	#									#["0.80"]
-    #									);
-    #die "Invalid array: fanInCountPercentages" if !validateArray(\@fanInCountPercentages);
     
     # Notice, layer one needs 3x because of small filter magnitudes, and 5x because of
     # number of afferent synapses, total 15x.
@@ -120,7 +95,7 @@
 										#["0.98"],
 										#["0.99"],
 										#["0.995"],
-										["0.999"],
+										["0.999"]
 										#["0.97","0.97"],
 										#["0.98","0.98"],
 										#["0.99","0.99"],
@@ -155,8 +130,10 @@
     my $pathWayLength					= 1;
     my @dimension						= (200);
     my @depth							= (1);
+    my @connectivity					= (FULL_CONNECTIVITY, FULL_CONNECTIVITY);  # FULL_CONNECTIVITY, SPARSE_CONNECTIVITY
     my @fanInRadius 					= (6); # not used
-    my @fanInCountPercentage 			= ("0.01");
+    my @connectivity 					= (6); # not used
+    my @fanInCountPercentage 			= ("0.01"); # Not easily permutble due to a variety of issues - generating different blank networks etc.
     my @learningrate					= ("0.1"); # < === is permuted below
     my @eta								= ("0.8");
     my @timeConstant					= ("0.1"); # < === is permuted below
@@ -171,9 +148,9 @@
     my @filterWidth						= (7);
     my @epochs							= (10); # only used in discrete model
     
-    ################################################################################################################################################################################################
-    # Preprocessing
-    ################################################################################################################################################################################################
+    #############################################################################
+	# Preprocessing
+    #############################################################################
     
     # Do some validation
     print "Uneven parameter length." if 
@@ -201,6 +178,7 @@
 
      	my %region   	= ('dimension'       	=>      $dimension[$r],
                          'depth'             	=>      $depth[$r],
+                         'connectivity'			=>		$connectivity[$r],
                          'fanInRadius'       	=>      $fanInRadius[$r],
                          'fanInCountPercentage' =>      $fanInCountPercentage[$r],
                          'learningrate'      	=>      $learningrate[$r],
@@ -264,7 +242,7 @@
 	# Make blank network #################
 	
 	# Prepare for xgrid
-	if($xgrid) {
+	if($xgrid == XGIRD_RUN) {
 		
         # Make xgrid file
         open (XGRID_FILE, '>'.$experimentFolder.'xgrid.txt') or die "Could not open file '${experimentFolder}xgrid.txt'. $!\n";
@@ -287,9 +265,10 @@
 	# Make copy of this script as summary of parameter space explored
     my $thisScript = abs_path($0);
 	copy($thisScript, $experimentFolder."ParametersCopy.pl") or die "Cannot make copy of parameter file: $!\n";
-    ################################################################################################################################################################################################
-    # Permuting
-    ################################################################################################################################################################################################
+	
+    #############################################################################
+	# Permuting
+    #############################################################################
     
     for my $sS (@sigmoidSlopes) {
     #for my $ficP (@fanInCountPercentages) {
@@ -348,9 +327,9 @@
 
 						# Build name so that only varying parameters are included.
 						my $simulationCode = "";
-						$simulationCode .= "tC=${tCstr}_" if ($neuronType == 1) && scalar(@timeConstants) > 1;
-						$simulationCode .= "sSF=${sSF}_" if ($neuronType == 1) && scalar(@stepSizeFraction) > 1;
-						$simulationCode .= "ttC=${ttC}_" if ($neuronType == 1) && scalar(@traceTimeConstant) > 1;
+						$simulationCode .= "tC=${tCstr}_" if ($neuronType == CONTINOUS) && scalar(@timeConstants) > 1;
+						$simulationCode .= "sSF=${sSF}_" if ($neuronType == CONTINOUS) && scalar(@stepSizeFraction) > 1;
+						$simulationCode .= "ttC=${ttC}_" if ($neuronType == CONTINOUS) && scalar(@traceTimeConstant) > 1;
 						$simulationCode .= "L=${Lstr}_" if scalar(@learningRates) > 1;
 						$simulationCode .= "S=${Sstr}_" if scalar(@sparsenessLevels) > 1;
 						#$simulationCode .= "F=${ficPstr}_" if scalar(@fanInCountPercentages) > 1;
@@ -359,7 +338,7 @@
 						# If there is only a single parameter combination being explored, then just give a long precise name,
 						# it's essentially not a parameter search.
 						if($simulationCode eq "") {
-							$simulationCode = "tC=${tCstr}_sSF=${sSF}_ttC=${ttC}_" if ($neuronType == 1);
+							$simulationCode = "tC=${tCstr}_sSF=${sSF}_ttC=${ttC}_" if ($neuronType == CONTINOUS);
 							$simulationCode = "L=${Lstr}_S=${Sstr}_sS=${sSPstr}_"; #_F=${ficPstr}
 						}
 						
@@ -484,7 +463,7 @@
 
 /*
 * What type of neuron type to use:
-* 0 = discrete, 1 = leaky integrator
+* 0 = discrete, 1 = continous
 */
 neuronType = $neuronType;
 
@@ -537,13 +516,6 @@ training: {
 	*/
 	nrOfEpochs = $nrOfEpochs; 
 };
-
-/*
-* Connectivity between regions
-* 0 = full
-* 1 = sparse
-*/
-connectivity = $connectivity;
 
 /*
 * Only used in build command:
@@ -642,6 +614,7 @@ TEMPLATE
 			$str .= "\n{\n";
 			$str .= "\tdimension         		= ". $tmp{"dimension"} .";\n";
 			$str .= "\tdepth             		= ". $tmp{"depth"} .";\n";
+			$str .= "\tconnectivity        		= ". $tmp{"connectivity"} .";\n"
 			$str .= "\tfanInRadius       		= ". $tmp{"fanInRadius"} .";\n";
 			$str .= "\tfanInCountPercentage     = ". $tmp{"fanInCountPercentage"} .";\n";
 			$str .= "\tlearningrate      		= ". $tmp{"learningrate"} .";\n";
