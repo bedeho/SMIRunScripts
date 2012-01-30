@@ -16,16 +16,16 @@
 	use Cwd 'abs_path';
 	use myConfig;
 	use myLib;
-	
+
 	#############################################################################
 	# Input
     #############################################################################
 	
 	# Run values
-	my $experiment 						= "FANC0.01-FULL-S200";
+	my $experiment 						= "test"; # FANC0.01-FULL-S200
 	my $stimuliTraining 				= "0.5s-4H-E13_training";
 	my $stimuliTesting 					= "0.5s-4H-E13_testOnTrained";
-	my $xgrid 							= XGIRD_RUN; # LOCAL_RUN, XGIRD_RUN
+	my $xgrid 							= LOCAL_RUN; # LOCAL_RUN, XGIRD_RUN
 
 	# FIXED PARAMS - non permutable
 	my $visualPreferenceDistance		= "6.0";
@@ -55,7 +55,7 @@
     
     # RANGE PARAMS - permutable
     my @sigmoidSlopes					= (
-										["300.0"]
+										["300.0","300.0"]
     									);
     die "Invalid array: sigmoidSlopes" if !validateArray(\@sigmoidSlopes);
     
@@ -71,7 +71,7 @@
 										#["1000.0"],
 										#["100.0"],
 										#["100000.0"],
-										["0.0"]
+										["0.0","0.0"]
 										#["0.000","0.1000"],
 										#["0.000","1.0000"],
 										#["0.000","10.000"],
@@ -95,7 +95,7 @@
 										#["0.98"],
 										#["0.99"],
 										#["0.995"],
-										["0.999"]
+										["0.90","0.90"]
 										#["0.97","0.97"],
 										#["0.98","0.98"],
 										#["0.99","0.99"],
@@ -114,7 +114,7 @@
     die "Invalid array: sparsenessLevels" if !validateArray(\@sparsenessLevels);
     
     my @timeConstants					= (
-    									["0.100"] 
+    									["0.100","0.100"] 
     									#["0.100"]
     									#["0.200"]
     									#["0.500"]
@@ -127,26 +127,25 @@
     my @traceTimeConstant				= ("2.500"); #,"0.100","0.500","1.500","2.500"); #("0.100", "0.050", "0.010")
 	die "Invalid array: traceTimeConstant" if !validateArray(\@traceTimeConstant);
 	
-    my $pathWayLength					= 1;
-    my @dimension						= (200);
-    my @depth							= (1);
-    my @connectivity					= (FULL_CONNECTIVITY, FULL_CONNECTIVITY);  # FULL_CONNECTIVITY, SPARSE_CONNECTIVITY
-    my @fanInRadius 					= (6); # not used
-    my @connectivity 					= (6); # not used
-    my @fanInCountPercentage 			= ("0.01"); # Not easily permutble due to a variety of issues - generating different blank networks etc.
-    my @learningrate					= ("0.1"); # < === is permuted below
-    my @eta								= ("0.8");
-    my @timeConstant					= ("0.1"); # < === is permuted below
-    my @sparsenessLevel					= ("0.1"); # < === is permuted below
-    my @sigmoidSlope 					= ("30.0"); # < === is permuted below
-    my @inhibitoryRadius				= ("6.0");
-    my @inhibitoryContrast				= ("1.4");
-   	my @somExcitatoryRadius				= ("0.6");
-    my @somExcitatoryContrast			= ("120.12");
-   	my @somInhibitoryRadius				= ("6.0");
-    my @somInhibitoryContrast			= ("1.4");
-    my @filterWidth						= (7);
-    my @epochs							= (10); # only used in discrete model
+    my $pathWayLength					= 2;
+    my @dimension						= (30,30);
+    my @depth							= (1,1);
+    my @connectivity					= (FULL_CONNECTIVITY, SPARSE_CONNECTIVITY);  # FULL_CONNECTIVITY, SPARSE_CONNECTIVITY
+    my @fanInRadius 					= (6,6); # not used
+    my @fanInCountPercentage 			= ("0.01","0.2"); # Not easily permutble due to a variety of issues - generating different blank networks etc.
+    my @learningrate					= ("0.1","0.1"); # < === is permuted below
+    my @eta								= ("0.8","0.8");
+    my @timeConstant					= ("0.1","0.1"); # < === is permuted below
+    my @sparsenessLevel					= ("0.1","0.1"); # < === is permuted below
+    my @sigmoidSlope 					= ("30.0","30.0"); # < === is permuted below
+    my @inhibitoryRadius				= ("6.0","6.0");
+    my @inhibitoryContrast				= ("1.4","1.4");
+   	my @somExcitatoryRadius				= ("0.6","0.6");
+    my @somExcitatoryContrast			= ("120.12","120.12");
+   	my @somInhibitoryRadius				= ("6.0","6.0");
+    my @somInhibitoryContrast			= ("1.4","1.4");
+    my @filterWidth						= (7,7);
+    my @epochs							= (10,10); # only used in discrete model
     
     #############################################################################
 	# Preprocessing
@@ -156,6 +155,7 @@
     print "Uneven parameter length." if 
     	$pathWayLength != scalar(@dimension) || 
     	$pathWayLength != scalar(@depth) || 
+    	$pathWayLength != scalar(@connectivity) || 
     	$pathWayLength != scalar(@fanInRadius) || 
     	$pathWayLength != scalar(@fanInCountPercentage) || 
     	$pathWayLength != scalar(@learningrate) || 
@@ -271,7 +271,6 @@
     #############################################################################
     
     for my $sS (@sigmoidSlopes) {
-    #for my $ficP (@fanInCountPercentages) {
 	for my $tC (@timeConstants) {
 	for my $sSF (@stepSizeFraction) {
 	for my $ttC (@traceTimeConstant) {
@@ -280,14 +279,12 @@
 						
 						# Layer spesific parameters
 						my @sigmoidSlopeArray 			= @{ $sS };
-						#my @fanInCountPercentageArray 	= @{ $ficP };
 						my @timeConstantArray 			= @{ $tC };
 						my @learningRateArray 			= @{ $l };
 						my @sparsityArray 				= @{ $s };
 						
 						print "Uneven parameter length found while permuting." if
 							$pathWayLength != scalar(@sigmoidSlopeArray) ||
-							#$pathWayLength != scalar(@fanInCountPercentageArray) ||
 							$pathWayLength != scalar(@timeConstantArray) ||
    							$pathWayLength != scalar(@learningRateArray) || 
    							$pathWayLength != scalar(@sparsityArray);
@@ -299,7 +296,6 @@
 						for my $region ( @esRegionSettings ) {
 							
 							$region->{'sigmoidSlope'} 			= $sigmoidSlopeArray[$layerCounter];
-							#$region->{'fanInCountPercentage'} 	= $fanInCountPercentageArray[$layerCounter];
 							$region->{'timeConstant'} 			= $timeConstantArray[$layerCounter];
 							$region->{'learningrate'} 			= $learningRateArray[$layerCounter];
 							$region->{'sparsenessLevel'} 		= $sparsityArray[$layerCounter];
@@ -312,9 +308,6 @@
 						
 						my $sSPstr = "@sigmoidSlopeArray";
 						$sSPstr =~ s/\s/-/g;
-												
-						#my $ficPstr = "@fanInCountPercentageArray";
-						#$ficPstr =~ s/\s/-/g;
 						
 						my $tCstr = "@timeConstantArray";
 						$tCstr =~ s/\s/-/g;
@@ -332,7 +325,6 @@
 						$simulationCode .= "ttC=${ttC}_" if ($neuronType == CONTINOUS) && scalar(@traceTimeConstant) > 1;
 						$simulationCode .= "L=${Lstr}_" if scalar(@learningRates) > 1;
 						$simulationCode .= "S=${Sstr}_" if scalar(@sparsenessLevels) > 1;
-						#$simulationCode .= "F=${ficPstr}_" if scalar(@fanInCountPercentages) > 1;
 						$simulationCode .= "sS=${sSPstr}_" if scalar(@sigmoidSlopes) > 1;
 						
 						# If there is only a single parameter combination being explored, then just give a long precise name,
@@ -551,9 +543,8 @@ sparsenessRoutine = $sparsenessRoutine;
 /*
 * What type of lateral interaction to use.
 * 0 = NONE
-* 1 = GLOBAL 
-* 2 = COMP
-* 3 = SOM
+* 1 = COMP
+* 2 = SOM
 */
 lateralInteraction = $lateralInteraction;
 
@@ -614,7 +605,7 @@ TEMPLATE
 			$str .= "\n{\n";
 			$str .= "\tdimension         		= ". $tmp{"dimension"} .";\n";
 			$str .= "\tdepth             		= ". $tmp{"depth"} .";\n";
-			$str .= "\tconnectivity        		= ". $tmp{"connectivity"} .";\n"
+			$str .= "\tconnectivity        		= ". $tmp{"connectivity"} .";\n";
 			$str .= "\tfanInRadius       		= ". $tmp{"fanInRadius"} .";\n";
 			$str .= "\tfanInCountPercentage     = ". $tmp{"fanInCountPercentage"} .";\n";
 			$str .= "\tlearningrate      		= ". $tmp{"learningrate"} .";\n";
