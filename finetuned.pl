@@ -22,7 +22,7 @@
     #############################################################################
 	
 	# Run values
-	my $experiment 						= "1000-sparsitySearch-FC0.1"; # FANC0.01-FULL-S200,TRACE-0.6FC-15
+	my $experiment 						= "finetunedlearning-2L-200-50-TRACE"; # FANC0.01-FULL-S200
 	my $stimuliTraining 				= "0.5s-4H-E13_training";
 	my $stimuliTesting 					= "0.5s-4H-E13_testOnTrained";
 	my $xgrid 							= LOCAL_RUN; # LOCAL_RUN, XGIRD_RUN
@@ -31,7 +31,7 @@
 	my $visualPreferenceDistance		= "6.0";
 	my $eyePositionPrefrerenceDistance	= "6.0";
 	my $gaussianSigma					= "6.0";
-	my $sigmoidSlope					= "10.0";
+	my $sigmoidSlope					= "10";
 	
 	my $horVisualFieldSize				= "200.0";
 	my $horEyePositionFieldSize			= "125.0";
@@ -39,7 +39,7 @@
 	my $neuronType						= CONTINOUS; # CONTINOUS, DISCRETE
     my $learningRule					= TRACE; # TRACE, HEBB
     
-    my $nrOfEpochs						= 0;
+    my $nrOfEpochs						= 20;
     my $saveNetworkAtEpochMultiple 		= 11111;
 	my $outputAtTimeStepMultiple		= 5;
 	
@@ -55,7 +55,7 @@
     
     # RANGE PARAMS - permutable
     my @sigmoidSlopes					= (
-										["3000000000.0"] # ,"3000000000.0"
+										["3000000000.0","3000000000.0"] # ,"300.0"
     									);
     die "Invalid array: sigmoidSlopes" if !validateArray(\@sigmoidSlopes);
     
@@ -72,39 +72,29 @@
 										#["0.5000"],
 										#["1.0000"],
 										#["5.0000"],
-                                        #["5.000"],
-                                        #["8.000"],
-										["0.0"]
+										#["10.000"],
+										#["20.000"],
 										#["50.000"],
 										#["100.00"],
 										#["500.00"],
 										#["1000.00"],
-										#["0.00"],
-										#["0.0"]
+										#["0.00"]
 										#["0.000","0.0010"],
 										#["0.000","0.0100"],
 										#["0.000","0.1000"],
 										#["0.000","1.0000"],
-										#["0.000","10.000"],
-										#["0.000","30.000"],
-										#["0.000","50.000"],
-										#["0.000","220.00"],
-										#["0.000","240.00"],
-										#["0.000","260.00"],
-										#["0.000","10.00"],
-										#["0.000","50.00"],
-										#["0.000","130.00"]
-										#["0.000","160.00"],								
-										#["0.000","300.00"]
-										#["0.000","150.00"],
-										#["0.000","200.00"],
-										#["0.000","250.00"],									
-										#["0.000","300.00"]
-										#["0.000","500.0"],
-										#["0.000","600.0"],
-										#["0.000","700.0"],
-										#["0.000","1000.0"]
-										#["0.000","10000.0"],
+										["0.000","20.0"],
+										["0.000","25.0"],
+										["0.000","30.0"],
+										["0.000","35.0"],
+										["0.000","40.0"],
+										["0.000","45.0"],
+										["0.000","50.0"],
+										["0.000","55.0"],
+										["0.000","60.0"],
+										["0.000","65.0"],
+										["0.000","70.0"],
+										["0.000","75.0"]
 										#["0.000","100000.0"]
     									);								
  	die "Invalid array: learningRates" if !validateArray(\@learningRates);
@@ -121,78 +111,8 @@
 										#["0.98"],
 										#["0.99"],
 										#["0.995"],
-										#["0.999","0.97"] # ,"0.90"
-										#["0.97","0.90"], # ,"0.90"
-										#["0.85"],
-										#["0.90"],
-										#["0.92"],
-										#["0.94"],
-										#["0.96"],
-# 10
-#["0.98"],
-#["0.80"],
-#["0.50"],
-#["0.0"],
-#["-4.0"],
-#["-9.0"],
-#*["-99.0"]
-# 30
-#["0.997"],
-#["0.97"],
-#["0.94"],
-#["0.88"],
-#["0.44"]
-#["-0.11"],
-#["-10.11"]
-# 50
-#["0.998"],
-#["0.992"],
-#["0.98"],
-#["0.96"],
-#["0.8"],
-#["0.6"]
-#["-3.0"]
-# 100
-["0.9998"]
-#["0.998"],
-#["0.995"],
-#["0.99"],
-#["0.95"],
-#["0.9"],
-#["0.0"]
-# 200
-#["0.99995"],
-#["0.9995"],
-#["0.99875"],
-#["0.9975"],
-#["0.9875"],
-#["0.975"],
-#["0.75"]
-# 400
-#["0.9999874"],
-#["0.999875"],
-#["0.9996875"],
-#["0.999375"],
-#["0.996875"],
-#["0.99375"],
-#["0.9375"]
-## 1000
-#["0.999998"],
-#["0.99998"],
-#["0.99995"],
-#["0.9999"],
-#["0.9995"],
-#["0.999"],
-#["0.9375"]
-
-										#["0.99"]
-										#["0.97","0.97"], # ,"0.90"
-										#["0.97","0.98"] # ,"0.90"
-										#["0.98","0.85"], # ,"0.90"
-										#["0.98","0.90"], # ,"0.90"
-										#["0.98","0.95"], # ,"0.90"
-										#["0.98","0.97"], # ,"0.90"
-										#["0.98","0.99"] # ,"0.90"
+										["0.999","0.98"] # 
+										#["0.97","0.97"],
 										#["0.98","0.98"],
 										#["0.99","0.99"],
 										#["0.995","0.995"],
@@ -210,7 +130,7 @@
     die "Invalid array: sparsenessLevels" if !validateArray(\@sparsenessLevels);
     
     my @timeConstants					= (
-    									["0.100"] # ,"0.100"
+    									["0.100","0.100"] # 
     									#["0.100"]
     									#["0.200"]
     									#["0.500"]
@@ -223,45 +143,45 @@
     my @traceTimeConstant				= ("2.500"); #,"0.100","0.500","1.500","2.500"); #("0.100", "0.050", "0.010")
 	die "Invalid array: traceTimeConstant" if !validateArray(\@traceTimeConstant);
 	
-    my $pathWayLength					= 1;
-    my @dimension						= (1000);
-    my @depth							= (1);
-    my @connectivity					= (SPARSE_CONNECTIVITY);  # FULL_CONNECTIVITY, SPARSE_CONNECTIVITY, SPARSE_BIASED
-    my @fanInRadius 					= (6); # not used
-    my @fanInCountPercentage 			= ("0.1"); # Not easily permutble due to a variety of issues - generating different blank networks etc.
-    my @learningrate					= ("0.1"); # < === is permuted below
-    my @eta								= ("0.8");
-    my @timeConstant					= ("0.1"); # < === is permuted below
-    my @sparsenessLevel					= ("0.1"); # < === is permuted below
-    my @sigmoidSlope 					= ("30.0"); # < === is permuted below
-    my @inhibitoryRadius				= ("6.0");
-    my @inhibitoryContrast				= ("1.4");
-    my @somExcitatoryRadius				= ("0.6");
-    my @somExcitatoryContrast			= ("120.12");
-    my @somInhibitoryRadius				= ("6.0");
-    my @somInhibitoryContrast			= ("1.4");
-    my @filterWidth						= (7);
-    my @epochs							= (10); # only used in discrete model
-    
-    #my $pathWayLength					= 2;
-    #my @dimension						= (200,15);
-    #my @depth							= (1,1);
-    #my @connectivity					= (FULL_CONNECTIVITY, SPARSE_CONNECTIVITY);  # FULL_CONNECTIVITY, SPARSE_CONNECTIVITY, SPARSE_BIASED
-    #my @fanInRadius 					= (6,6); # not used
-    #my @fanInCountPercentage 			= ("0.01","0.6"); # Not easily permutble due to a variety of issues - generating different blank networks etc.
-    #my @learningrate					= ("0.1","0.1"); # < === is permuted below
-    #my @eta								= ("0.8","0.8");
-    #my @timeConstant					= ("0.1","0.1"); # < === is permuted below
-    #my @sparsenessLevel					= ("0.1","0.1"); # < === is permuted below
-    #my @sigmoidSlope 					= ("30.0","30.0"); # < === is permuted below
-    #my @inhibitoryRadius				= ("6.0","6.0");
-    #my @inhibitoryContrast				= ("1.4","1.4");
-   	#my @somExcitatoryRadius				= ("0.6","0.6");
-    #my @somExcitatoryContrast			= ("120.12","120.12");
-   	#my @somInhibitoryRadius				= ("6.0","6.0");
-    #my @somInhibitoryContrast			= ("1.4","1.4");
-    #my @filterWidth						= (7,7);
-    #my @epochs							= (10,10); # only used in discrete model
+    #my $pathWayLength					= 1;
+    #my @dimension						= (200);
+    #my @depth							= (1);
+    #my @connectivity					= (FULL_CONNECTIVITY);  # FULL_CONNECTIVITY, SPARSE_CONNECTIVITY
+    #my @fanInRadius 					= (6); # not used
+    #my @fanInCountPercentage 			= ("0.01"); # Not easily permutble due to a variety of issues - generating different blank networks etc.
+    #my @learningrate					= ("0.1"); # < === is permuted below
+    #my @eta								= ("0.8");
+    #my @timeConstant					= ("0.1"); # < === is permuted below
+    #my @sparsenessLevel					= ("0.1"); # < === is permuted below
+    #my @sigmoidSlope 					= ("30.0"); # < === is permuted below
+    #my @inhibitoryRadius				= ("6.0");
+    #my @inhibitoryContrast				= ("1.4");
+   	#my @somExcitatoryRadius				= ("0.6");
+    #my @somExcitatoryContrast			= ("120.12");
+   	#my @somInhibitoryRadius				= ("6.0");
+    #my @somInhibitoryContrast			= ("1.4");
+    #my @filterWidth						= (7);
+    #my @epochs							= (10); # only used in discrete model
+       
+    my $pathWayLength					= 2;
+    my @dimension						= (200,50);
+    my @depth							= (1,1);
+    my @connectivity					= (FULL_CONNECTIVITY, SPARSE_CONNECTIVITY);  # FULL_CONNECTIVITY, SPARSE_CONNECTIVITY
+    my @fanInRadius 					= (6,6); # not used
+    my @fanInCountPercentage 			= ("0.01","0.1"); # Not easily permutble due to a variety of issues - generating different blank networks etc.
+    my @learningrate					= ("0.1","0.1"); # < === is permuted below
+    my @eta								= ("0.8","0.8");
+    my @timeConstant					= ("0.1","0.1"); # < === is permuted below
+    my @sparsenessLevel					= ("0.1","0.1"); # < === is permuted below
+    my @sigmoidSlope 					= ("30.0","30.0"); # < === is permuted below
+    my @inhibitoryRadius				= ("6.0","6.0");
+    my @inhibitoryContrast				= ("1.4","1.4");
+   	my @somExcitatoryRadius				= ("0.6","0.6");
+    my @somExcitatoryContrast			= ("120.12","120.12");
+   	my @somInhibitoryRadius				= ("6.0","6.0");
+    my @somInhibitoryContrast			= ("1.4","1.4");
+    my @filterWidth						= (7,7);
+    my @epochs							= (10,10); # only used in discrete model
     
     #############################################################################
 	# Preprocessing
