@@ -22,24 +22,26 @@
     #############################################################################
 	
 	# Run values
-	my $experiment 						= "1000-sparsitySearch-FC0.1"; # FANC0.01-FULL-S200,TRACE-0.6FC-15
-	my $stimuliTraining 				= "0.5s-4H-E13_training";
-	my $stimuliTesting 					= "0.5s-4H-E13_testOnTrained";
+	my $experiment 						= "tc=010-test_lowesparsity";
+	my $stimuliTraining 				= "simple-fD=0.20-vpD=6.00-epD=6.00-gS=6.00-sS=10.00-training";
+	my $stimuliTesting 					= "simple-fD=0.20-vpD=6.00-epD=6.00-gS=6.00-sS=10.00-testOnTrained";
 	my $xgrid 							= LOCAL_RUN; # LOCAL_RUN, XGIRD_RUN
 
-	# FIXED PARAMS - non permutable
-	my $visualPreferenceDistance		= "6.0";
-	my $eyePositionPrefrerenceDistance	= "6.0";
-	my $gaussianSigma					= "6.0";
-	my $sigmoidSlope					= "10.0";
+	# Load params from stimuli name
+	my $visualPreferenceDistance;
+	my $eyePositionPrefrerenceDistance;
+	my $gaussianSigma;
+	my $sigmoidSlope;
+	loadLIPParams($stimuliTraining);
 	
+	# FIXED PARAMS - non-permutable
 	my $horVisualFieldSize				= "200.0";
 	my $horEyePositionFieldSize			= "125.0";
 
 	my $neuronType						= CONTINOUS; # CONTINOUS, DISCRETE
     my $learningRule					= TRACE; # TRACE, HEBB
     
-    my $nrOfEpochs						= 0;
+    my $nrOfEpochs						= 20;
     my $saveNetworkAtEpochMultiple 		= 11111;
 	my $outputAtTimeStepMultiple		= 5;
 	
@@ -55,7 +57,7 @@
     
     # RANGE PARAMS - permutable
     my @sigmoidSlopes					= (
-										["3000000000.0"] # ,"3000000000.0"
+										["3000000000.0","3000000000.0"] # ,"3000000000.0"
     									);
     die "Invalid array: sigmoidSlopes" if !validateArray(\@sigmoidSlopes);
     
@@ -74,7 +76,10 @@
 										#["5.0000"],
                                         #["5.000"],
                                         #["8.000"],
-										["0.0"]
+										#["0.0","1000.0"],
+										#["0.0","5000.0"],
+										#["0.0","10000.0"],
+										["0.0","15000.0"]
 										#["50.000"],
 										#["100.00"],
 										#["500.00"],
@@ -135,7 +140,7 @@
 #["0.0"],
 #["-4.0"],
 #["-9.0"],
-#*["-99.0"]
+#["-99.0"]
 # 30
 #["0.997"],
 #["0.97"],
@@ -153,37 +158,16 @@
 #["0.6"]
 #["-3.0"]
 # 100
-["0.9998"]
+["0.9998","0.98"],
+#["0.9998","0.95"]
+#["0.9998","0.90"],
+#["0.9998","0.80"]
 #["0.998"],
 #["0.995"],
 #["0.99"],
 #["0.95"],
 #["0.9"],
 #["0.0"]
-# 200
-#["0.99995"],
-#["0.9995"],
-#["0.99875"],
-#["0.9975"],
-#["0.9875"],
-#["0.975"],
-#["0.75"]
-# 400
-#["0.9999874"],
-#["0.999875"],
-#["0.9996875"],
-#["0.999375"],
-#["0.996875"],
-#["0.99375"],
-#["0.9375"]
-## 1000
-#["0.999998"],
-#["0.99998"],
-#["0.99995"],
-#["0.9999"],
-#["0.9995"],
-#["0.999"],
-#["0.9375"]
 
 										#["0.99"]
 										#["0.97","0.97"], # ,"0.90"
@@ -210,7 +194,7 @@
     die "Invalid array: sparsenessLevels" if !validateArray(\@sparsenessLevels);
     
     my @timeConstants					= (
-    									["0.100"] # ,"0.100"
+    									["0.010","0.010"] # ,"0.100"
     									#["0.100"]
     									#["0.200"]
     									#["0.500"]
@@ -223,45 +207,45 @@
     my @traceTimeConstant				= ("2.500"); #,"0.100","0.500","1.500","2.500"); #("0.100", "0.050", "0.010")
 	die "Invalid array: traceTimeConstant" if !validateArray(\@traceTimeConstant);
 	
-    my $pathWayLength					= 1;
-    my @dimension						= (1000);
-    my @depth							= (1);
-    my @connectivity					= (SPARSE_CONNECTIVITY);  # FULL_CONNECTIVITY, SPARSE_CONNECTIVITY, SPARSE_BIASED
-    my @fanInRadius 					= (6); # not used
-    my @fanInCountPercentage 			= ("0.1"); # Not easily permutble due to a variety of issues - generating different blank networks etc.
-    my @learningrate					= ("0.1"); # < === is permuted below
-    my @eta								= ("0.8");
-    my @timeConstant					= ("0.1"); # < === is permuted below
-    my @sparsenessLevel					= ("0.1"); # < === is permuted below
-    my @sigmoidSlope 					= ("30.0"); # < === is permuted below
-    my @inhibitoryRadius				= ("6.0");
-    my @inhibitoryContrast				= ("1.4");
-    my @somExcitatoryRadius				= ("0.6");
-    my @somExcitatoryContrast			= ("120.12");
-    my @somInhibitoryRadius				= ("6.0");
-    my @somInhibitoryContrast			= ("1.4");
-    my @filterWidth						= (7);
-    my @epochs							= (10); # only used in discrete model
+    #my $pathWayLength					= 1;
+    #my @dimension						= (100);
+    #my @depth							= (1);
+    #my @connectivity					= (SPARSE_CONNECTIVITY);  # FULL_CONNECTIVITY, SPARSE_CONNECTIVITY, SPARSE_BIASED
+    #my @fanInRadius 					= (6); # not used
+    #my @fanInCountPercentage 			= ("0.1"); # Not easily permutble due to a variety of issues - generating different blank networks etc.
+    #my @learningrate					= ("0.1"); # < === is permuted below
+    #my @eta								= ("0.8");
+    #my @timeConstant					= ("0.1"); # < === is permuted below
+    #my @sparsenessLevel					= ("0.1"); # < === is permuted below
+    #my @sigmoidSlope 					= ("30.0"); # < === is permuted below
+    #my @inhibitoryRadius				= ("6.0");
+    #my @inhibitoryContrast				= ("1.4");
+    #my @somExcitatoryRadius				= ("0.6");
+    #my @somExcitatoryContrast			= ("120.12");
+    #my @somInhibitoryRadius				= ("6.0");
+    #my @somInhibitoryContrast			= ("1.4");
+    #my @filterWidth						= (7);
+    #my @epochs							= (10); # only used in discrete model
     
-    #my $pathWayLength					= 2;
-    #my @dimension						= (200,15);
-    #my @depth							= (1,1);
-    #my @connectivity					= (FULL_CONNECTIVITY, SPARSE_CONNECTIVITY);  # FULL_CONNECTIVITY, SPARSE_CONNECTIVITY, SPARSE_BIASED
-    #my @fanInRadius 					= (6,6); # not used
-    #my @fanInCountPercentage 			= ("0.01","0.6"); # Not easily permutble due to a variety of issues - generating different blank networks etc.
-    #my @learningrate					= ("0.1","0.1"); # < === is permuted below
-    #my @eta								= ("0.8","0.8");
-    #my @timeConstant					= ("0.1","0.1"); # < === is permuted below
-    #my @sparsenessLevel					= ("0.1","0.1"); # < === is permuted below
-    #my @sigmoidSlope 					= ("30.0","30.0"); # < === is permuted below
-    #my @inhibitoryRadius				= ("6.0","6.0");
-    #my @inhibitoryContrast				= ("1.4","1.4");
-   	#my @somExcitatoryRadius				= ("0.6","0.6");
-    #my @somExcitatoryContrast			= ("120.12","120.12");
-   	#my @somInhibitoryRadius				= ("6.0","6.0");
-    #my @somInhibitoryContrast			= ("1.4","1.4");
-    #my @filterWidth						= (7,7);
-    #my @epochs							= (10,10); # only used in discrete model
+    my $pathWayLength					= 2;
+    my @dimension						= (100,10);
+    my @depth							= (1,1);
+    my @connectivity					= (FULL_CONNECTIVITY, FULL_CONNECTIVITY);  # FULL_CONNECTIVITY, SPARSE_CONNECTIVITY, SPARSE_BIASED
+    my @fanInRadius 					= (6,6); # not used
+    my @fanInCountPercentage 			= ("0.01","0.6"); # Not easily permutble due to a variety of issues - generating different blank networks etc.
+    my @learningrate					= ("0.1","0.1"); # < === is permuted below
+    my @eta								= ("0.8","0.8");
+    my @timeConstant					= ("0.1","0.1"); # < === is permuted below
+    my @sparsenessLevel					= ("0.1","0.1"); # < === is permuted below
+    my @sigmoidSlope 					= ("30.0","30.0"); # < === is permuted below
+    my @inhibitoryRadius				= ("6.0","6.0");
+    my @inhibitoryContrast				= ("1.4","1.4");
+   	my @somExcitatoryRadius				= ("0.6","0.6");
+    my @somExcitatoryContrast			= ("120.12","120.12");
+   	my @somInhibitoryRadius				= ("6.0","6.0");
+    my @somInhibitoryContrast			= ("1.4","1.4");
+    my @filterWidth						= (7,7);
+    my @epochs							= (10,10); # only used in discrete model
     
     #############################################################################
 	# Preprocessing
@@ -539,6 +523,21 @@
 		system($MATLAB . " -r \"cd('$MATLAB_SCRIPT_FOLDER');plotExperiment('$experiment','$stimuliTesting');\"");	
 	}
 	
+	sub loadLIPParams {
+		
+		my ($sName) = @_;
+		
+		# simple-fD=0.20-vpD=6.00-epD=6.00-gS=6.00-sS=10.00-testOnTrained
+		my @res = ($sName =~ m/(\d+\.\d+|)/g);
+		print (@res);
+		
+		#$fD = $res[0];
+		$visualPreferenceDistance		= $res[1];
+		$eyePositionPrefrerenceDistance	= $res[2];
+		$gaussianSigma					= $res[3];
+		$sigmoidSlope					= $res[4];
+	}
+	
 	sub makeParameterFile {
 		
 		my ($a, $stepSizeFraction, $traceTimeConstant) = @_;
@@ -592,11 +591,14 @@ continuous : {
 	resetActivity = $resetActivity;
 	
 	/*
-	* Parameters controlling what values to output, what layers is governed by "output" parameter in each layer.
+	* Parameters controlling what values to output, 
+	* what layers is governed by "output" parameter in each layer.
 	*/
 	outputNeurons = $outputNeurons;
 	outputWeights = $outputWeights;
-	outputAtTimeStepMultiple = $outputAtTimeStepMultiple; /* Only continous neurons, may lead to no output both in training and testing!*/
+	
+	/* Only continous neurons, may lead to no output both in training and testing!*/
+	outputAtTimeStepMultiple = $outputAtTimeStepMultiple; 
 };
 
 training: {
