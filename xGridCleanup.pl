@@ -11,7 +11,7 @@
 	use strict;
     use warnings;
     use POSIX;
-	use File::Copy;
+	use File::Copy "cp";
 	use Data::Dumper;
 	use myConfig;
 
@@ -39,12 +39,12 @@
         die "No stimuli name provided\n";
 	}
 	
-	my $nrOfEyePositionsInTesting;
-	if($#ARGV >= 2) {
-        $nrOfEyePositionsInTesting = $ARGV[2];
-	} else {
-        die "No eye position name provided\n";
-	}
+	#my $nrOfEyePositionsInTesting;
+	#if($#ARGV >= 2) {
+    #    $nrOfEyePositionsInTesting = $ARGV[2];
+	#} else {
+    #    die "No eye position name provided\n";
+	#}
 	
     my $experimentFolder 		= $BASE."Experiments/".$experiment."/";
     my $experimentFolderBackup	= $BASE."Experiments/".$experiment."_backup/";
@@ -82,7 +82,7 @@
 		print "****************************************************************************************************\n";
 		
 		# Move it into dir
-		move($experimentFolder.$file, "${experimentFolder}${i}/Parameters.txt") or die "Moving parameter file $file failed: $!\n";
+		system("mv $experimentFolder.$file ${experimentFolder}${i}/Parameters.txt") or die "Moving parameter file $file failed: $!\n";
 					
 		# Make /Training subdirectory
 		mkdir("${experimentFolder}${i}/Training") or die "Could not make training dir ${experimentFolder}${i}/Training dir: $!\n";
@@ -96,15 +96,15 @@
 		# Copy blank network into folder so that we can do control test automatically
 		my $blankNetworkSRC = $experimentFolder."BlankNetwork.txt";
 		my $blankNetworkDEST = $experimentFolder.$i."/BlankNetwork.txt";
-		copy($blankNetworkSRC, $blankNetworkDEST) or die "Copying blank network failed: $!\n";
+		cp($blankNetworkSRC, $blankNetworkDEST) or die "Copying blank network failed: $!\n";
 		
 		# Rename dir
 		my $simulation = substr($file, 0, -4);
-		move($experimentFolder.$i, $experimentFolder.$simulation) or die "Renaming folder ${experimentFolder}${simulation} failed: $!\n";
+		system("mv $experimentFolder.$i $experimentFolder.$simulation") or die "Renaming folder ${experimentFolder}${simulation} failed: $!\n";
 		
 		# Run test
 		system($PERL_RUN_SCRIPT, "test", $experiment, $simulation, $stimuli);
 	}
 	
 	# Call matlab to plot all
-	system($MATLAB . " -r \"cd('$MATLAB_SCRIPT_FOLDER');plotExperiment('$experiment',$nrOfEyePositionsInTesting);\"");
+	system($MATLAB . " -r \"cd('$MATLAB_SCRIPT_FOLDER');plotExperiment('$experiment','$stimuli');\"");

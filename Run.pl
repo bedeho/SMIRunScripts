@@ -11,7 +11,7 @@
 	use strict;
 	use warnings;
 	use POSIX;
-	use File::Copy;
+	#use File::Copy "cp";
 	use Data::Dumper;
 	use myConfig;
 	
