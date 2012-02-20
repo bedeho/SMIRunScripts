@@ -93,7 +93,7 @@
 					# 1. trained net (TrainedNetwork)
 					# 2. intermediate nets (TrainedNetwork_epoch_transform)
 					# 3. untrained control nets (BlankNetwork)
-					opendir(DIR, $simulationFolder) or die $!;
+					opendir(DIR, $simulationFolder) or die "Unable to open directory $simulationFolder : $!";
 					
 					while (my $file = readdir(DIR)) {
 	

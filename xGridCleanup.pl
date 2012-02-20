@@ -82,7 +82,7 @@
 		print "****************************************************************************************************\n";
 		
 		# Move it into dir
-		system("mv $experimentFolder.$file ${experimentFolder}${i}/Parameters.txt") or die "Moving parameter file $file failed: $!\n";
+		system("mv ${experimentFolder}$file ${experimentFolder}${i}/Parameters.txt") == 0 or die "Moving parameter file $file failed: $!\n";
 					
 		# Make /Training subdirectory
 		mkdir("${experimentFolder}${i}/Training") or die "Could not make training dir ${experimentFolder}${i}/Training dir: $!\n";
@@ -100,7 +100,7 @@
 		
 		# Rename dir
 		my $simulation = substr($file, 0, -4);
-		system("mv $experimentFolder.$i $experimentFolder.$simulation") or die "Renaming folder ${experimentFolder}${simulation} failed: $!\n";
+		system("mv ${experimentFolder}$i ${experimentFolder}$simulation") == 0 or die "Renaming folder ${experimentFolder}${simulation} failed: $!\n";
 		
 		# Run test
 		system($PERL_RUN_SCRIPT, "test", $experiment, $simulation, $stimuli);

@@ -23,7 +23,9 @@
 	
 	# Run values
 	
-	my $experiment	 					= "tttt"; # trace-random-sejnowski-h4-e8-100-10-fiC0.2
+	my $experiment	 					= "xgridTest"; # trace-random-sejnowski-h4-e8-100-10-fiC0.2
+	
+	#fineTuned22-smallertimestep
 	
 	#my $stim							= "random-sejnowski-move=10_4-fD=0.20-sA=16.00-vpD=8.00-epD=6.00-gS=8.00-sS=0.06-vF=200.00-eF=125.00";
 	
@@ -48,7 +50,7 @@
 	my $neuronType						= CONTINOUS; # CONTINOUS, DISCRETE
     my $learningRule					= TRACE; # TRACE, HEBB
     
-    my $nrOfEpochs						= 100;
+    my $nrOfEpochs						= 5; #100
     my $saveNetworkAtEpochMultiple 		= 21;
 	my $outputAtTimeStepMultiple		= 5;
 	
@@ -83,24 +85,27 @@
 										#["5.0000"],
                                         #["5.000"],
                                         #["8.000"],
+                                        
 										["0.0","8000.0"],
 										["0.0","7500.0"],
-										["0.0","7000.0"],
-										["0.0","6500.0"],
-										["0.0","6000.0"],
-										["0.0","5500.0"],
-										["0.0","5000.0"],
-										["0.0","4500.0"],
-										["0.0","4000.0"],
-										["0.0","3500.0"],
-										["0.0","3000.0"],
-										["0.0","2500.0"],
-										["0.0","2000.0"],
-										["0.0","1500.0"],
-										["0.0","1000.0"],
-										["0.0","0500.0"],
-										["0.0","0100.0"],
-										["0.0","0050.0"]
+										["0.0","7000.0"]
+										
+										#["0.0","6500.0"],
+										#["0.0","6000.0"],
+										#["0.0","5500.0"],
+										#["0.0","5000.0"],
+										#["0.0","4500.0"],
+										#["0.0","4000.0"],
+										#["0.0","3500.0"],
+										#["0.0","3000.0"],
+										#["0.0","2500.0"],
+										#["0.0","2000.0"],
+										#["0.0","1500.0"],
+										#["0.0","1000.0"],
+										#["0.0","0500.0"],
+										#["0.0","0100.0"],
+										#["0.0","0050.0"]
+										
 										#["0.0","4000.0"]
 										#["0.000","0.0010"],
 										#["0.000","0.0100"],
@@ -196,7 +201,7 @@
     									);
     die "Invalid array: timeConstants" if !validateArray(\@timeConstants);
  	
-    my @stepSizeFraction				= ("0.5");  #0.1 = 1/10, 0.05 = 1/20, 0.02 = 1/50
+    my @stepSizeFraction				= ("0.05");  #0.1 = 1/10, 0.05 = 1/20, 0.02 = 1/50
     die "Invalid array: stepSizeFraction" if !validateArray(\@stepSizeFraction);
     
     my @traceTimeConstant				= ("2.500"); #,"0.100","0.500","1.500","2.500"); #("0.100", "0.050", "0.010")
@@ -297,6 +302,12 @@
                          'epochs'   		 	=>      $epochs[$r],
                          'outputHistory'  		=>      $outputHistory[$r]
                          );
+                         
+         if($outputHistory[$r] eq "true" && $xgrid == XGIRD_RUN) {
+         	print("Error: Outputting history in layer " . $outputHistory[$r] . " ... not possible while on grid\n");
+         	#my $input = <STDIN>;
+         	exit;
+         } 
 
          push @esRegionSettings, \%region;
     }
@@ -364,6 +375,9 @@
         
         # Copy SMI binary, if this is xgrid run
 		cp($PROGRAM, $experimentFolder.$BINARY) or die "Cannot make copy of binary: $!\n" if ($xgrid);
+		
+		# Make result directory
+        mkdir($xgridResult);
 	}
 	
 	# Make copy of this script as summary of parameter space explored
