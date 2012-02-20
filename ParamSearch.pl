@@ -23,7 +23,7 @@
 	
 	# Run values
 	
-	my $experiment	 					= "xxx2"; # trace-random-sejnowski-h4-e8-100-10-fiC0.2
+	my $experiment	 					= "tttt"; # trace-random-sejnowski-h4-e8-100-10-fiC0.2
 	
 	#my $stim							= "random-sejnowski-move=10_4-fD=0.20-sA=16.00-vpD=8.00-epD=6.00-gS=8.00-sS=0.06-vF=200.00-eF=125.00";
 	
@@ -48,8 +48,8 @@
 	my $neuronType						= CONTINOUS; # CONTINOUS, DISCRETE
     my $learningRule					= TRACE; # TRACE, HEBB
     
-    my $nrOfEpochs						= 10;
-    my $saveNetworkAtEpochMultiple 		= 11111;
+    my $nrOfEpochs						= 100;
+    my $saveNetworkAtEpochMultiple 		= 21;
 	my $outputAtTimeStepMultiple		= 5;
 	
 	# only continous neurons?
@@ -83,9 +83,24 @@
 										#["5.0000"],
                                         #["5.000"],
                                         #["8.000"],
-										["0.0","9000.0"],
-										["0.0","4500.0"]
-										#["0.0","2000.0"],
+										["0.0","8000.0"],
+										["0.0","7500.0"],
+										["0.0","7000.0"],
+										["0.0","6500.0"],
+										["0.0","6000.0"],
+										["0.0","5500.0"],
+										["0.0","5000.0"],
+										["0.0","4500.0"],
+										["0.0","4000.0"],
+										["0.0","3500.0"],
+										["0.0","3000.0"],
+										["0.0","2500.0"],
+										["0.0","2000.0"],
+										["0.0","1500.0"],
+										["0.0","1000.0"],
+										["0.0","0500.0"],
+										["0.0","0100.0"],
+										["0.0","0050.0"]
 										#["0.0","4000.0"]
 										#["0.000","0.0010"],
 										#["0.000","0.0100"],
@@ -176,7 +191,8 @@
     die "Invalid array: sparsenessLevels" if !validateArray(\@sparsenessLevels);
     
     my @timeConstants					= (
-    									["0.100","0.100"] #,["0.100"]
+    									#["0.100","0.100"], #,["0.100"]
+    									["0.100","0.100"]
     									);
     die "Invalid array: timeConstants" if !validateArray(\@timeConstants);
  	
@@ -185,6 +201,9 @@
     
     my @traceTimeConstant				= ("2.500"); #,"0.100","0.500","1.500","2.500"); #("0.100", "0.050", "0.010")
 	die "Invalid array: traceTimeConstant" if !validateArray(\@traceTimeConstant);
+	
+	
+	#"0.600",
 	
     #my $pathWayLength					= 1;
     #my @dimension						= (100);
@@ -208,11 +227,11 @@
     #my @outputHistory			= ("false");
     
     my $pathWayLength					= 2;
-    my @dimension						= (100,25);
+    my @dimension						= (100,10);
     my @depth							= (1,1);
     my @connectivity					= (SPARSE_CONNECTIVITY, SPARSE_CONNECTIVITY);  # FULL_CONNECTIVITY, SPARSE_CONNECTIVITY, SPARSE_BIASED
     my @fanInRadius 					= (6,6); # not used
-    my @fanInCountPercentage 			= ("0.1","0.2"); # Not easily permutble due to a variety of issues - generating different blank networks etc.
+    my @fanInCountPercentage 			= ("0.1","0.8"); # Not easily permutble due to a variety of issues - generating different blank networks etc.
     my @learningrate					= ("0.1","0.1"); # < === is permuted below
     my @eta								= ("0.8","0.8");
     my @timeConstant					= ("0.1","0.1"); # < === is permuted below
@@ -226,7 +245,7 @@
     my @somInhibitoryContrast			= ("1.4","1.4");
     my @filterWidth						= (7,7);
     my @epochs							= (10,10); # only used in discrete model
-    my @outputHistory					= ("false","true");
+    my @outputHistory					= ("false","false");
     
     #############################################################################
 	# Preprocessing
@@ -303,19 +322,20 @@
 		} else {
 			die("Well played.\n"); 
 		}
-		
-		# COPY source code in, while it is zipped!!!!!
-		# COPY source code in, while it is zipped!!!!!
-		# COPY source code in, while it is zipped!!!!!
-		# COPY source code in, while it is zipped!!!!!
-		# COPY source code in, while it is zipped!!!!!
-		# COPY source code in, while it is zipped!!!!!
-		
 	}
-    
+	
 	# Make experiment folder
 	mkdir($experimentFolder);
 	
+	# Copy source code folder to experiment, perl cp command cant do folders
+	system("cp -R ${BASE}Source ${experimentFolder}") == 0 or die "Cannot make copy of source code folder: $!\n";
+
+	# Compress source code folder
+	system("tar -cjvf ${experimentFolder}source.tbz ${experimentFolder}Source") == 0 or die "Cannot tar source code folder: $!\n";
+	
+	# Delete source code folder
+	system("rm -f -r ${experimentFolder}Source") == 0 or die "Cannot tar source code folder: $!\n";
+
     # Make blank network #################
 	
 	# Make temporary parameter file
@@ -344,18 +364,6 @@
         
         # Copy SMI binary, if this is xgrid run
 		cp($PROGRAM, $experimentFolder.$BINARY) or die "Cannot make copy of binary: $!\n" if ($xgrid);
-		# CHANGE PERMISSIONS!!!!!!!
-		#¢asfasfasd
-		#fas#d
-		#fasd
-		#f
-                
-        # Make result directory
-        mkdir($xgridResult);
-        
-        # Copy source code as backup
-		# Gives tons of error messages
-		#system "cp -R $sourceFolder ${BASE}Experiments/${experiment}" or die "Make source copy: $!\n";
 	}
 	
 	# Make copy of this script as summary of parameter space explored
@@ -481,7 +489,7 @@
 								
 								# Copy blank network into folder so that we can do control test automatically
 								#print "Copying blank network: ". $blankNetworkSRC . " \n";
-								copy($blankNetworkSRC, $blankNetworkDEST) or die "Copying blank network failed: $!\n";
+								cp($blankNetworkSRC, $blankNetworkDEST) or die "Copying blank network failed: $!\n";
 								
 								# Run test
 								system($PERL_RUN_SCRIPT, "test", $experiment, $simulation, $stimuliTesting) == 0 or exit;
